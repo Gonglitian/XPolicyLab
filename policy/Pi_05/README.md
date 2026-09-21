@@ -71,3 +71,18 @@ Environment variables used by the adapter scripts:
 | `OPENPI_LOCAL_CACHE_ROOT` | Per-host local cache root for the HF datasets / JAX compilation caches; defaults to `/tmp/openpi-cache-$(hostname)`. |
 
 `OPENPI_ROOT` and `OPENPI_SRC` are additional overrides consumed by the local scripts.
+
+## Shared LIBERO / RoboCasa365 clients
+
+The LIBERO and RoboCasa365 environment launchers delegate to the common
+[`benchmarks/run_client.sh`](../../benchmarks/run_client.sh). See the
+[contract and current validation limits](../../benchmarks/README.md).
+The LIBERO adapter uses `env_cfg_type=libero_franka`, `action_type=ee`.
+RoboCasa365 requires a separate PandaOmron-trained checkpoint and model-side
+state/action mapping; the existing LIBERO checkpoints are rejected for that benchmark.
+
+For `bench_name=LIBERO`, the adapter selects the official `pi05_libero` inference
+configuration (horizon 10, continuous state input, no extra delta transform),
+loads normalization from `assets/physical-intelligence/libero`, and requires
+the JAX `params/_METADATA` checkpoint. A PyTorch `model.safetensors` checkpoint
+is rejected. Existing ALOHA defaults do not apply to this branch.

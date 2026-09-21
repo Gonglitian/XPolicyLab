@@ -17,6 +17,10 @@ XPL_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 BENCH_ROOT="$(cd "${XPL_ROOT}/.." && pwd)"
 UTILS_DIR="${XPL_ROOT}/utils"
 
+case "${bench_name,,}" in
+    libero|robocasa|robocasa365) exec bash "${XPL_ROOT}/benchmarks/run_client.sh" "$@" ;;
+esac
+
 policy_name="$(basename "${SCRIPT_DIR}")"
 yaml_file="${XPL_ROOT}/policy/${policy_name}/deploy.yml"
 

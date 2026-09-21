@@ -1,0 +1,22 @@
+policy_name: GR00T_N15
+protocol: ws
+host: localhost
+port: null
+bench_name: LIBERO
+task_name: libero_spatial
+ckpt_name: null
+env_cfg_type: libero_franka
+seed: 0
+action_type: ee
+gpu_id: null
+eval_batch: false
+
+# Relative paths resolve from policy/GR00T_N15/.
+gr00t_root: null
+model_path: null
+checkpoint_path: null
+libero_suite: null
+denoising_steps: 8
+device: cuda
+default_prompt: Perform the manipulation task.
+request_timeout_s: 180
