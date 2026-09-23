@@ -59,3 +59,20 @@ Environment variables used by the adapter scripts:
 ## Notes
 
 - If a checkpoint directory lacks processor/tokenizer files, set `processor_path` in `deploy.yml` to the base model directory before evaluation.
+
+## Shared LIBERO / RoboCasa365 clients
+
+The LIBERO and RoboCasa365 environment launchers delegate to the common
+[`benchmarks/run_client.sh`](../../benchmarks/run_client.sh). See the
+[contract and current validation limits](../../benchmarks/README.md).
+The LIBERO adapter uses `env_cfg_type=libero_franka`, `action_type=ee`.
+RoboCasa365 requires a separate PandaOmron-trained checkpoint and model-side
+state/action mapping; the existing LIBERO checkpoints are rejected for that benchmark.
+
+The LIBERO branch uses domain 3, agentview plus wrist RGB, column-stacked
+rotation-6D, absolute EEF targets, and the official previous-chunk proprio
+update. It loads the processor bundled with that LIBERO checkpoint, bypassing
+the generic shared-pretrain processor default. Only agentview is rotated;
+wrist orientation stays native. Use
+`LIBERO_ACTION_CHUNK_STEPS=30` to execute the official checkpoint's full chunk;
+the common smoke default of 1 is a different replanning schedule.

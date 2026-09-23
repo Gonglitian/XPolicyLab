@@ -1,0 +1,8 @@
+{
+  "openpi": {"url": "https://github.com/robocasa-benchmark/openpi.git", "commit": "5a6beda9ff99da30b4e1b59320f6a32971d7c397"},
+  "libero": {"url": "https://github.com/Lifelong-Robot-Learning/LIBERO.git", "commit": "8f1084e3132a39270c3a13ebe37270a43ece2a01"},
+  "robocasa": {"url": "https://github.com/robocasa/robocasa.git", "commit": "be22d659b02db8f6d7f3a3c3edc742934fdcbaae"},
+  "robosuite": {"url": "https://github.com/ARISE-Initiative/robosuite.git", "commit": "85abee228d1c43ab1939bce33028099945d453b4"},
+  "gr00t-libero": {"url": "https://github.com/NVIDIA/Isaac-GR00T.git", "commit": "4af2b622892f7dcb5aae5a3fb70bcb02dc217b96"},
+  "gr00t-robocasa": {"url": "https://github.com/robocasa-benchmark/Isaac-GR00T.git", "commit": "9d7d7a9eb7ad30bd8ce30448d9ab53a918b45b10"}
+}

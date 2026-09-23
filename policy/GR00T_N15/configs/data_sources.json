@@ -1,0 +1,35 @@
+{
+  "libero": {
+    "prepared_lerobot": {
+      "source": "IPEC-COMMUNITY",
+      "format": "LeRobot compatible with NVIDIA GR00T N1.5",
+      "suites": {
+        "libero_spatial": "IPEC-COMMUNITY/libero_spatial_no_noops_1.0.0_lerobot",
+        "libero_object": "IPEC-COMMUNITY/libero_object_no_noops_1.0.0_lerobot",
+        "libero_goal": "IPEC-COMMUNITY/libero_goal_no_noops_1.0.0_lerobot",
+        "libero_10": "IPEC-COMMUNITY/libero_10_no_noops_lerobot"
+      }
+    },
+    "raw_hdf5": {
+      "source": "yifengzhu-hf/LIBERO-datasets",
+      "format": "benchmark HDF5",
+      "conversion": "episode-wise streaming to final LeRobot output"
+    }
+  },
+  "robocasa365": {
+    "human": {
+      "source": "RoboCasa official dataset registry: source=human, split=pretrain or target",
+      "documentation": "https://github.com/robocasa/robocasa/blob/main/docs/datasets/using_datasets.md",
+      "format": "official LeRobot v2 with meta/modality.json; validate local metadata before use",
+      "download_command_template": "python -m robocasa.scripts.download_datasets --tasks <task> --split <pretrain|target> --source human",
+      "status": "official prepared format verified; no local readable dataset or download performed"
+    },
+    "mimicgen": {
+      "source": "RoboCasa official dataset registry: source=mimicgen, split=pretrain",
+      "documentation": "https://github.com/robocasa/robocasa/blob/main/docs/datasets/using_datasets.md",
+      "format": "official LeRobot v2 with meta/modality.json; validate local metadata before use",
+      "download_command_template": "python -m robocasa.scripts.download_datasets --tasks <task> --split pretrain --source mimicgen",
+      "status": "official prepared format verified; no local readable dataset or download performed"
+    }
+  }
+}

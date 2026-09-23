@@ -88,6 +88,12 @@ def _resolve_pi05_model_root(model_cfg: dict[str, Any]) -> Path:
 
 class Model(ModelTemplate):
     def __init__(self, model_cfg: dict[str, Any]):
+        self._is_libero = str(model_cfg.get('bench_name', '')).lower() == 'libero'
+        self._is_robocasa = str(model_cfg.get('bench_name', '')).lower() in ('robocasa', 'robocasa365')
+        if self._is_robocasa and model_cfg.get('action_type') != 'ee':
+            raise ValueError('RoboCasa365 requires action_type=ee')
+        if self._is_libero and (model_cfg.get('action_type') != 'ee' or model_cfg.get('env_cfg_type') != 'libero_franka'):
+            raise ValueError('LIBERO requires libero_franka and action_type=ee')
         self.task_name = model_cfg["task_name"]
         self.action_type = model_cfg.get("action_type", "joint")
         self.robot_action_dim_info = (
@@ -100,6 +106,21 @@ class Model(ModelTemplate):
         self.model = self.policy
 
     def get_model(self, model_cfg: dict[str, Any]):
+        if self._is_robocasa:
+            from .robocasa_adapter import make_config
+            model_root = _resolve_pi05_model_root(model_cfg)
+            if (model_root / 'model.safetensors').exists() or not (model_root / 'params' / '_METADATA').is_file():
+                raise ValueError('RoboCasa Pi_05 requires the official JAX Orbax checkpoint')
+            if not (model_root / 'assets' / 'norm_stats.json').is_file():
+                raise ValueError('RoboCasa Human300 checkpoint must include assets/norm_stats.json')
+            norm_stats = _normalize.load(model_root / 'assets')
+            return _policy_config.create_trained_policy(make_config(norm_stats), str(model_root), norm_stats=norm_stats)
+        if self._is_libero:
+            from .libero_adapter import make_config
+            model_root = _resolve_pi05_model_root(model_cfg)
+            if (model_root / 'model.safetensors').exists() or not (model_root / 'params' / '_METADATA').is_file():
+                raise ValueError('LIBERO Pi_05 requires the official JAX Orbax checkpoint (params/_METADATA)')
+            return _policy_config.create_trained_policy(make_config(), str(model_root))
         train_config_name = model_cfg.get("train_config_name", "pi05_aloha")
         repo_id = model_cfg.get("repo_id", "1118")
         model_root = _resolve_pi05_model_root(model_cfg)
@@ -116,6 +137,15 @@ class Model(ModelTemplate):
 
     def update_obs_batch(self, obs_list):
         self._latest_env_idx_list = [obs.get("env_idx", index) for index, obs in enumerate(obs_list)]
+        if self._is_libero or self._is_robocasa:
+            if self._is_libero:
+                from .libero_adapter import encode_observation
+            else:
+                from .robocasa_adapter import encode_observation
+            if len(set(self._latest_env_idx_list)) != len(obs_list):
+                raise ValueError('Duplicate environment indices')
+            self.observation_window = [encode_observation(obs) for obs in obs_list]
+            return
         encoded_obs_list = [
             encode_obs(obs, self.action_type, self.robot_action_dim_info) for obs in obs_list
         ]
@@ -130,6 +160,13 @@ class Model(ModelTemplate):
             raise AssertionError("update_obs or update_obs_batch first!")
 
         env_idx_list = env_idx_list or self._latest_env_idx_list
+        if self._is_libero or self._is_robocasa:
+            if self._is_libero:
+                from .libero_adapter import decode_action
+            else:
+                from .robocasa_adapter import decode_action
+            observations = dict(zip(self._latest_env_idx_list, self.observation_window))
+            return [decode_action(self.policy.infer(observations[i], **kwargs)['actions']) for i in env_idx_list]
         # actions = self.policy.infer(self.observation_window, **kwargs)["actions"]
         action_list = []
 

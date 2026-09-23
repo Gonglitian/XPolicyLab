@@ -1,0 +1,6 @@
+Isaac-GR00T
+checkpoints/
+outputs/
+*.log
+__pycache__/
+.pytest_cache/

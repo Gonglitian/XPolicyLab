@@ -1,0 +1,30 @@
+{
+  "libero_spatial": {
+    "repo_id": "youliangtan/gr00t-n1.5-libero-spatial-posttrain",
+    "revision": "03294ae3de7d4870be8ae6e27cbdeffcb46b6425",
+    "data_config": "examples.Libero.custom_data_config:LiberoDataConfig",
+    "used_storage_bytes": 7586072344,
+    "license": null
+  },
+  "libero_object": {
+    "repo_id": "youliangtan/gr00t-n1.5-libero-object-posttrain",
+    "revision": "f422266b016fd917127d3a0348062a5cd750df43",
+    "data_config": "examples.Libero.custom_data_config:LiberoDataConfig",
+    "used_storage_bytes": 7586072344,
+    "license": null
+  },
+  "libero_goal": {
+    "repo_id": "youliangtan/gr00t-n1.5-libero-goal-posttrain",
+    "revision": "17be45f5bf8a543594761b263c68cf33f33847bd",
+    "data_config": "examples.Libero.custom_data_config:LiberoDataConfigMeanStd",
+    "used_storage_bytes": 7586072344,
+    "license": null
+  },
+  "libero_10": {
+    "repo_id": "youliangtan/gr00t-n1.5-libero-long-posttrain",
+    "revision": "aa49078d5cc9ce72917bc4312f1ef12771f277de",
+    "data_config": "examples.Libero.custom_data_config:LiberoDataConfig",
+    "used_storage_bytes": 7586072344,
+    "license": null
+  }
+}

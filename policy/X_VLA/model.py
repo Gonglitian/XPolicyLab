@@ -331,6 +331,12 @@ def action_chunk_to_ee_dict_list(action_chunk: np.ndarray):
 class Model(ModelTemplate):
     def __init__(self, model_cfg):
         self.model_cfg = dict(model_cfg)
+        self._is_libero = str(model_cfg.get('bench_name', '')).lower() == 'libero'
+        self._libero_proprio = {}
+        if str(model_cfg.get('bench_name', '')).lower() in ('robocasa', 'robocasa365'):
+            raise ValueError('RoboCasa365 requires a PandaOmron-trained adapter/checkpoint; LIBERO/RoboDojo are incompatible')
+        if self._is_libero and model_cfg.get('env_cfg_type') != 'libero_franka':
+            raise ValueError('LIBERO requires env_cfg_type=libero_franka')
         self.task_name = self.model_cfg.get("task_name", "default_task")
         self.action_type = self.model_cfg.get("action_type", "ee")
         if self.action_type != "ee":
@@ -354,6 +360,10 @@ class Model(ModelTemplate):
 
     def _load_processor(self, model_cfg):
         checkpoint_root = _resolve_checkpoint_root(model_cfg)
+        if self._is_libero:
+            if checkpoint_root is None or not (checkpoint_root / 'preprocessor_config.json').is_file():
+                raise FileNotFoundError('The LIBERO checkpoint must include its own processor files')
+            return XVLAProcessor.from_pretrained(str(checkpoint_root))
         candidate_paths = _build_candidate_dirs(
             checkpoint_root,
             model_cfg.get("processor_path"),
@@ -416,7 +426,14 @@ class Model(ModelTemplate):
             obs.get("env_idx", index) if isinstance(obs, dict) else index
             for index, obs in enumerate(obs_list)
         ]
-        self.observation_window = [encode_obs(obs, self.default_prompt) for obs in obs_list]
+        if self._is_libero:
+            from .libero_adapter import encode_observation
+            if len(set(self._latest_env_idx_list)) != len(obs_list):
+                raise ValueError('Duplicate environment indices')
+            self.observation_window = [encode_observation(obs, self._libero_proprio.get(i))
+                                       for i, obs in zip(self._latest_env_idx_list, obs_list)]
+        else:
+            self.observation_window = [encode_obs(obs, self.default_prompt) for obs in obs_list]
 
     def infer(self, observation: dict[str, Any], steps: int | None = None):
         pil_images = [Image.fromarray(image) for image in observation["images"]]
@@ -428,7 +445,7 @@ class Model(ModelTemplate):
                 f"Processor returned incomplete inputs: missing {sorted(missing_inputs)} for prompt={prompt!r}."
             )
         proprio = torch.as_tensor(observation["proprio"], dtype=torch.float32).unsqueeze(0)
-        domain_id = torch.tensor([int(self.model_cfg.get("domain_id", 0))], dtype=torch.long)
+        domain_id = torch.tensor([3 if self._is_libero else int(self.model_cfg.get("domain_id", 0))], dtype=torch.long)
 
         def to_model(tensor: torch.Tensor):
             if tensor.is_floating_point():
@@ -454,6 +471,17 @@ class Model(ModelTemplate):
 
         env_idx_list = env_idx_list or self._latest_env_idx_list
         action_list = []
+        if self._is_libero:
+            from .libero_adapter import decode_action
+            observations = dict(zip(self._latest_env_idx_list, self.observation_window))
+            for index in env_idx_list:
+                encoded = observations[index]
+                chunk = self.infer(encoded)
+                action_list.append(decode_action(chunk))
+                proprio = encoded['proprio'].copy()
+                proprio[:9] = chunk[-1, :9]
+                self._libero_proprio[index] = proprio
+            return action_list
         for batch_index, _ in enumerate(env_idx_list):
             encoded_obs = self.observation_window[batch_index]
             action_chunk = self.infer(encoded_obs)
@@ -461,5 +489,6 @@ class Model(ModelTemplate):
         return action_list
 
     def reset(self):
+        self._libero_proprio = {}
         self.observation_window = None
         self._latest_env_idx_list = [0]

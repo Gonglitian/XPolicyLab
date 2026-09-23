@@ -22,5 +22,13 @@
     "franka": {
         "arm_dim": [7, 7],
         "ee_dim": [1, 1]
+    },
+    "robocasa_panda_omron": {
+        "arm_dim": [7],
+        "ee_dim": [1]
+    },
+    "libero_franka": {
+        "arm_dim": [7],
+        "ee_dim": [1]
     }
 }
