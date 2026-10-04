@@ -13,14 +13,8 @@ from common import ROOT, ASSETS, RUN, SUITES, write_json
 from gpu_guard import snapshot, Guard
 
 CODE = Path(__file__).resolve().parent
-PI_PY = Path(os.environ.get('V1_PI_PY', str(ROOT / 'XPolicyLab-envs/pi05-robocasa/bin/python')))
-SIM_PY = Path(os.environ.get('V1_SIM_PY', str(ASSETS / 'envs/xvla-sanity/bin/python')))
-# Extra PYTHONPATH entries for the policy and simulator processes (labserver defaults below).
-PI_PATHS = os.environ.get('V1_PI_PATHS', ':'.join([str(ROOT / 'XPolicyLab-upstreams/openpi-robocasa/src'),
-    '/data1/vla-reasoning/proj/EvoMoE/eval/robocasa/deps/robocasa', '/data1/vla-reasoning/proj/EvoMoE/eval/robocasa/deps/robosuite']))
-SIM_PATHS = os.environ.get('V1_SIM_PATHS', '/home/vla-reasoning/proj/autofocus_3d/baselines/libero')
-# Delete a task's checkpoint once the next task is trained and evaluated (only the carry-over checkpoint is needed).
-PRUNE = os.environ.get('V1_PRUNE_CHECKPOINTS') == '1'
+PI_PY = ROOT / 'XPolicyLab-envs/pi05-robocasa/bin/python'
+SIM_PY = ASSETS / 'envs/xvla-sanity/bin/python'
 # One policy server per client: the served Model keeps a single observation window, so clients must not share it.
 SERVERS = WORKERS = 4
 
@@ -31,18 +25,17 @@ def environment(gpu, sim=False):
         CUDA_DEVICE_ORDER='PCI_BUS_ID', CUDA_VISIBLE_DEVICES=gpu,
         XLA_PYTHON_CLIENT_PREALLOCATE='false', XLA_PYTHON_CLIENT_MEM_FRACTION='0.92',
         MUJOCO_GL='egl', PYOPENGL_PLATFORM='egl', TOKENIZERS_PARALLELISM='false',
-        TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD='1',
-        LIBERO_CONFIG_PATH=os.environ.get('V1_LIBERO_CONFIG', str(ASSETS / 'sanity_checks/20260922/xvla_libero/libero_config')),
-        JAX_COMPILATION_CACHE_DIR=os.environ.get('V1_JAX_CACHE', str(RUN / 'jax_cache')), PYTHONHASHSEED='42')
-    if Path('/usr/bin/ffmpeg').exists():
-        env['IMAGEIO_FFMPEG_EXE'] = '/usr/bin/ffmpeg'
+        TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD='1', IMAGEIO_FFMPEG_EXE='/usr/bin/ffmpeg',
+        LIBERO_CONFIG_PATH=str(ASSETS / 'sanity_checks/20260922/xvla_libero/libero_config'),
+        JAX_COMPILATION_CACHE_DIR=str(RUN / 'jax_cache'), PYTHONHASHSEED='42')
     paths = [str(CODE), str(ASSETS / 'envs/xvla-ws-deps'), str(ROOT), str(ROOT / 'XPolicyLab')]
     if sim:
-        paths[:0] = SIM_PATHS.split(':')
+        paths.insert(0, '/home/vla-reasoning/proj/autofocus_3d/baselines/libero')
         env['MUJOCO_EGL_DEVICE_ID'] = gpu
     else:
-        paths.insert(0, PI_PATHS.split(':')[0])
-        paths.extend(PI_PATHS.split(':')[1:])
+        paths.insert(0, str(ROOT / 'XPolicyLab-upstreams/openpi-robocasa/src'))
+        paths.extend(['/data1/vla-reasoning/proj/EvoMoE/eval/robocasa/deps/robocasa',
+                      '/data1/vla-reasoning/proj/EvoMoE/eval/robocasa/deps/robosuite'])
     env['PYTHONPATH'] = ':'.join(paths)
     return env
 
@@ -181,11 +174,6 @@ class Lane:
         matrix = json.loads(path.read_text()) if path.exists() else {}
         matrix[str(task)] = row
         write_json(path, matrix)
-        previous = root / method / suite / f'task{task - 1:02d}'
-        if PRUNE and task > 0 and (previous / 'evaluated.json').exists() and (previous / 'checkpoints').exists():
-            import shutil
-            shutil.rmtree(previous / 'checkpoints')
-            print('PRUNED', previous / 'checkpoints', flush=True)
         print('STAGE_DONE', method, suite, task, json.dumps(row), flush=True)
 
 def main():

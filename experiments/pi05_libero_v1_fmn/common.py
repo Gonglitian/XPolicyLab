@@ -18,13 +18,12 @@ import os
 from pathlib import Path
 import numpy as np
 
-# Paths default to tasl-labserver; another server overrides them via V1_* variables (see bcc_env.sh).
-ROOT = Path(os.environ.get('V1_ROOT', '/data2/vla-reasoning/proj'))
-ASSETS = Path(os.environ.get('V1_ASSETS', str(ROOT / 'XPolicyLab-assets')))
+ROOT = Path('/data2/vla-reasoning/proj')
+ASSETS = ROOT / 'XPolicyLab-assets'
 RUN = Path(os.environ.get('V1_RUN', str(ASSETS / 'baselines/pi05_libero_v1_fmn')))
-DATA = Path(os.environ.get('V1_DATA', str(ASSETS / 'datasets/libero_pi_lerobot')))
-BASE = Path(os.environ.get('V1_BASE', str(ASSETS / 'checkpoints/cl_base/pi05_base')))
-OPENPI = Path(os.environ.get('V1_OPENPI', str(ROOT / 'XPolicyLab-upstreams/openpi-robocasa')))
+DATA = ASSETS / 'datasets/libero_pi_lerobot'
+BASE = ASSETS / 'checkpoints/cl_base/pi05_base'
+OPENPI = ROOT / 'XPolicyLab-upstreams/openpi-robocasa'
 SUITES = ['libero_spatial', 'libero_object', 'libero_goal', 'libero_10']
 HORIZONS = dict(zip(SUITES, [220, 280, 300, 520]))
 STEPS_PER_TASK = 10000
