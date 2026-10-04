@@ -13,7 +13,7 @@
 同一个 Slurm step/cgroup 中。程序继承 Slurm 的 CUDA_VISIBLE_DEVICES，不接受物理 GPU 编号。
 GPU 空闲与排队由 Slurm 负责；已移除 wait_idle、GPU guard 和退出码 75 的等待重试。
 
-完整两任务训练冒烟、1 万步/50 次单任务评测、scancel 训练恢复、checkpoint 清理和可训练参数快照仍属于后续任务。当前入口检查不等同于这些验收。
+完整两任务训练冒烟、1 万步/50 次单任务评测、scancel 训练恢复仍属于后续验收。checkpoint 清理与可训练参数快照已实现并通过 CPU 检查，完整模型 Slurm 验证仍待完成。当前入口检查不等同于这些验收。
 
 ## Slurm 提交（labserver）
 
@@ -150,7 +150,7 @@ HPCC 的真实路径需要 Litian 提供；同一 commit 可通过配置覆盖�
 ```bash
 source experiments/pi05_libero_v1_fmn/labserver_env.sh
 mkdir -p "$TMPDIR"
-PYTHONDONTWRITEBYTECODE=1 "$V1_PI_PY" -m unittest discover \
+JAX_PLATFORMS=cpu PYTHONDONTWRITEBYTECODE=1 "$V1_PI_PY" -m unittest discover \
   -s experiments/pi05_libero_v1_fmn/tests -v
 ```
 
@@ -224,3 +224,85 @@ bash experiments/pi05_libero_v1_fmn/submit.sh er libero_spatial --chain-next --c
 `74bbe0fbb76f051eff883e04d582ab5ee4d34d9d`。在保存本次证据时，989 仍因 Resources 排队，
 990 处于 `afterany:989` 依赖等待，因此尚未声称合成接续运行通过。该状态是检查快照，
 不是实时状态，见 [validation/slurm_chain_989_990.json](validation/slurm_chain_989_990.json)。
+
+## Checkpoint 清理与可训练参数快照
+
+新建流默认启用 checkpoint 清理，额外快照默认关闭：
+
+```bash
+# 关闭额外快照：完成十个任务后仅留下任务 9 的完整 checkpoint。
+bash experiments/pi05_libero_v1_fmn/submit.sh er libero_spatial --chain-next
+
+# 开启额外快照：另用一个新输出目录，从任务 0 开始留存全部历史快照。
+V1_RUN=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_v1_with_snapshots \
+bash experiments/pi05_libero_v1_fmn/submit.sh er libero_spatial \
+  --chain-next --save-trainable-snapshots
+```
+
+重新提交时保持输出目录、模式和快照开关一致。开关写入流内
+`retention_policy.json`；中途改变会报错，因为已清理的早期模型无法补出历史快照。
+接续作业继承相同开关。已有 task 目录、但没有该策略文件的旧流仍按旧方式续跑，
+不自动清理、不补历史快照；开启本规则请从新的 V1_RUN 开始。不会批量修改历史归档。
+
+### 清理时机
+
+1. 训练每 1000 步及任务末保存完整 checkpoint。新流使用原生 Orbax 的
+   `keep_period=1` 保留训练期间的保存点，不让原生 `max_to_keep=1` 提前淘汰中间点。
+2. 当前任务最终保存已完成、`trained.json` 已发布后，清理前一任务的完整 checkpoint。
+   前一任务必须已经评测完成；开启快照时，两任务的快照也必须完整。
+3. 当前任务评测成功，评测记录和 matrix 已保存后，删除当前任务的中间 checkpoint，
+   只保留最终完整 checkpoint。评测失败时保留当前任务的中间保存点。
+4. 十任务流完成后，只剩 task09 的完整 checkpoint。开启快照时，另保留 task00–09
+   各一份 `trainable_snapshot/`。日志、buffer、metadata、训练及评测记录均保留。
+
+删除只发生在持有 stream.lock 的调度进程中，限定本流已知 checkpoint 目录，
+拒绝符号链接。删除前写退休记录和审计日志；中途被终止后可以重试，
+并沿退休记录确认还有较新的完整 checkpoint，不能把意外缺文件当作已清理。
+`retention.jsonl` 记录删除开始、完成和释放的已分配字节。没有评测完成记录不会执行中间清理。
+
+### 快照的内容与读取
+
+`taskXX/trainable_snapshot/params/` 是 Orbax PyTree，仅保存
+`state.params.filter(config.trainable_filter)`：与实际训练相同的可训练参数集合，
+包括视觉编码器、LoRA 及其余可训练投影等；没有冻结权重、Adam 状态或学习率调度状态。
+快照不是完整续训 checkpoint。训练恢复仍从完整 checkpoint 加载。
+
+`manifest.json` 记录任务、global step、参数名称/形状/dtype、参数数量/字节、
+代码 commit、模型配置和底座来源。base_path_provenance 是来源说明，不是迁移后的加载路径。
+保存先写流内临时目录，成功后原子发布；不完整快照不会允许完整 checkpoint 被清理。
+中断遗留临时快照在成功发布且完整 checkpoint 确认后清理。
+
+以后编写探针时，可用兼容版本的 Orbax 读取 `params` 树，再按 manifest 中的参数名称、
+形状和 dtype 校验目标模型后替换选定部件。跨 CPU/GPU 拓扑恢复需要为目标树显式提供
+restore/sharding 参数，不能假设保存时的 GPU 拓扑在其他机器仍然存在。
+本次只增加快照保存，没有实现具体 MoE 探针实验。
+
+### 磁盘记录与尚未完成的实测
+
+以下按用户提供的约 8.9 GB/完整 checkpoint 和约 2 GB/快照估算，
+**不是新实现的十任务流实测峰值**：
+
+| 设置 | 完成后的权重占用估算 | 运行中同时保留的权重占用估算上界 |
+| --- | --- | --- |
+| 快照关闭 | 约 8.9 GB | 约 97.9 GB（前一任务 1 份 + 当前任务 10 个保存点） |
+| 快照开启 | 约 28.9 GB | 约 117.9 GB（上述 11 份 + 最多 10 份快照，保守相加） |
+
+该估算不包含共享缓存、数据、底座、源码、文件系统开销和中断残留临时文件。
+`disk_usage.json` 在保存/清理边界记录本流已分配字节及采样峰值；这是离散采样，
+不包含共享缓存，也不能代替连续磁盘峰值实测。十任务流开/关两种配置的真实峰值仍待
+后续 Slurm 完整实验测量，不能将小型测试数字当作模型占用。
+
+labserver 在创建目录之前校验 V1_RUN 与所有配置缓存目录的真实路径都在 /data2 下，
+包括 TMPDIR、HF、openpi、JAX、XDG、Torch、Triton、CUDA、pip、uv、matplotlib、numba。
+路径覆盖或符号链接指向根分区时会报错。BCC 使用自己的机器配置，不套用 /data2 路径限制。
+
+### 本步验证范围
+
+通过 36 项 CPU 回归测试：包含清理时序、评测失败、删除中断重试、目录迁移、
+旧流保护、十任务结束的保留数量、快照开关传递给接续作业，以及真实 Orbax
+快照往返读取（包括 bf16）。另外使用当前 openpi 原生保存器在 CPU 上保存三个
+小型 checkpoint，确认 keep_period=1 保留全部保存点且合成 step/state 可恢复。
+根分区缓存覆盖被实际拒绝，shell 语法与本实验目录补丁检查通过。
+
+这些检查没有运行完整 pi0.5 训练，不替代 Slurm 冒烟、真实 Adam/LR 中断续跑、
+成功率、并行实验、BCC 实机或磁盘峰值验收。

@@ -1,0 +1,31 @@
+{
+  "recorded_at_utc": "2026-10-04T07:20:30.550702+00:00",
+  "test_count": 36,
+  "passed": true,
+  "gpu_used": false,
+  "real_model_training": false,
+  "orbax_snapshot_roundtrip": true,
+  "bfloat16_preserved": true,
+  "ten_task_fixtures": {
+    "snapshots_off": {
+      "full_checkpoints": 1,
+      "snapshots": 0
+    },
+    "snapshots_on": {
+      "full_checkpoints": 1,
+      "snapshots": 10
+    }
+  },
+  "native_openpi_cpu": {
+    "saved_steps": [
+      1000,
+      2000,
+      3000
+    ],
+    "all_retained": true,
+    "synthetic_state_restored": true
+  },
+  "root_cache_override_rejected": true,
+  "ten_task_real_model_peak_measured": false,
+  "bcc_verified": false
+}

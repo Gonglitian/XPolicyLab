@@ -14,6 +14,8 @@ from common import (OPENPI, RUN, STEPS_PER_TASK, CURRENT_BATCH, REPLAY_PER_TASK,
 from slurm_runtime import require_slurm
 from paths import resolve_checkpoint, relative_path
 from resume import latest_complete_step
+from retention import ensure_policy, sample_disk
+from trainable_snapshot import save_snapshot
 
 def main():
     p = argparse.ArgumentParser()
@@ -23,6 +25,7 @@ def main():
     p.add_argument('--steps-per-task', type=int, default=STEPS_PER_TASK)
     p.add_argument('--root', type=Path, default=RUN)
     p.add_argument('--preflight', action='store_true')
+    p.add_argument('--save-trainable-snapshots', action='store_true')
     args = p.parse_args()
     require_slurm()
     import jax
@@ -36,6 +39,7 @@ def main():
     assert jax.device_count() == 1 and jax.devices()[0].platform == 'gpu', jax.devices()
     spt = args.steps_per_task
     stream = args.root / args.method / args.suite
+    retention_settings = ensure_policy(stream, args.save_trainable_snapshots)
     stage = stream / f'task{args.task:02d}'
     stage.mkdir(parents=True, exist_ok=True)
     previous = stream / f'task{args.task-1:02d}'
@@ -71,7 +75,7 @@ def main():
     native = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(native)
     manager, resuming = checkpoints.initialize_checkpoint_dir(config.checkpoint_dir,
-        keep_period=None, overwrite=False, resume=config.checkpoint_dir.exists())
+        keep_period=1 if retention_settings else None, overwrite=False, resume=config.checkpoint_dir.exists())
     train_rng, init_rng = jax.random.split(jax.random.key(42))
     resume_step = latest_complete_step(manager.all_steps(), config.checkpoint_dir, begin_step, end_step)
     source_checkpoint = None
@@ -87,7 +91,7 @@ def main():
         assert prev_trained['end_step'] == begin_step, prev_trained
         source_checkpoint = relative_path(resolve_checkpoint(stream, prev_trained['checkpoint'], args.task - 1), stream)
         prev_manager, ok = checkpoints.initialize_checkpoint_dir(resolve_checkpoint(stream, prev_trained['checkpoint'], args.task - 1).parent,
-            keep_period=None, overwrite=False, resume=True)
+            keep_period=1 if retention_settings else None, overwrite=False, resume=True)
         assert ok, 'previous task checkpoint missing'
         assert begin_step in prev_manager.all_steps(), (begin_step, prev_manager.all_steps())
         state, state_sharding = native.init_train_state(config, init_rng, mesh, resume=True)
@@ -135,7 +139,7 @@ def main():
         trainable_parameters=sum(int(np.prod(v.shape)) for v in leaves.values()),
         frozen_parameters=sum(int(np.prod(v.shape)) for v in frozen.values()),
         trainable_groups=sorted({k.split('/')[0] + '/' + k.split('/')[1] for k in keys}),
-        preflight=args.preflight)
+        preflight=args.preflight, save_trainable_snapshots=args.save_trainable_snapshots)
     write_json(stage / 'run_config.json', run_config)
     print('CONFIG_READY', json.dumps(run_config), flush=True)
     step_fn = jax.jit(functools.partial(native.train_step, config),
@@ -179,15 +183,25 @@ def main():
         if completed % 1000 == 0 or completed == end_step:
             checkpoints.save_state(manager, state, saved_loader, completed)
             manager.wait_until_finished()
+            sample_disk(stream, 'checkpoint_saved')
     assert int(state.step) == end_step
     manager.wait_until_finished()
     checkpoint = config.checkpoint_dir / str(end_step)
     assert (checkpoint / 'params').is_dir() and (checkpoint / 'train_state').is_dir()
+    if args.save_trainable_snapshots:
+        from paths import BASE
+        save_snapshot(stage / 'trainable_snapshot', state.params, config.trainable_filter,
+            task=args.task, step=end_step, metadata=dict(method=args.method, suite=args.suite,
+                code_commit=os.environ.get('V1_CODE_COMMIT'), base_name=BASE.name,
+                base_path_provenance=str(BASE), model=str(config.model),
+                trainable_filter=str(config.trainable_filter),
+                normalization='../../metadata/norm/' + args.suite))
+        sample_disk(stream, 'trainable_snapshot_saved')
     if args.method == 'er':
         # Fixed random subset reused for the rest of the stream (Continual-VLAs create_deterministic_buffer).
         indices = np.random.RandomState(42 + args.task).choice(len(current), min(REPLAY_PER_TASK, len(current)), replace=False)
         write_json(stage / 'buffer.json', dict(indices=sorted(indices.tolist()), frames=len(current), task=args.task))
-    write_json(stage / 'trained.json', dict(checkpoint=relative_path(checkpoint, stream), checkpoint_path_base='stream', begin_step=begin_step, end_step=end_step,
+    write_json(stage / 'trained.json', dict(checkpoint=relative_path(checkpoint, stream), checkpoint_path_base='stream', checkpoint_complete=True, begin_step=begin_step, end_step=end_step,
         seconds=time.monotonic() - began, finished_at=time.time(), preflight=args.preflight))
     manager.close()
     print('STAGE_TRAINED', checkpoint, flush=True)

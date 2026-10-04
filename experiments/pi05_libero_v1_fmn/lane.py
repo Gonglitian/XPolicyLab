@@ -12,6 +12,7 @@ from common import RUN, SUITES, write_json
 from paths import CODE, REPO, OPENPI, configured_path, resolve_checkpoint
 from slurm_runtime import require_slurm, stream_lock, install_signal_handlers, stop_processes, wait_ready
 from resume import stage_action, check_predecessor
+from retention import ensure_policy, after_training, after_evaluation, verify_artifacts
 
 PI_PY = configured_path('V1_PI_PY')
 SIM_PY = configured_path('V1_SIM_PY')
@@ -46,7 +47,8 @@ def environment(sim=False):
     return env
 
 class Lane:
-    def __init__(self, method, suite, mode='formal'):
+    def __init__(self, method, suite, mode='formal', save_trainable_snapshots=False):
+        self.save_trainable_snapshots = save_trainable_snapshots
         self.method, self.suite, self.mode = method, suite, mode
         self.root = RUN if mode == 'formal' else RUN / mode
         self.stream = self.root / method / suite
@@ -152,7 +154,13 @@ class Lane:
             command = [PI_PY, CODE / 'train_stage.py', '--method', method, '--suite', suite, '--task', task,
                        '--steps-per-task', steps_per_task, '--root', root]
             if preflight: command.append('--preflight')
+            if self.save_trainable_snapshots: command.append('--save-trainable-snapshots')
             self.run_logged(command, stage / 'train.log', environment())
+        live_checkpoint = verify_artifacts(stage.parent, task, steps_per_task)
+        if live_checkpoint:
+            after_training(stage.parent, task, steps_per_task, episodes)
+        elif action != 'skip':
+            raise RuntimeError('A retired checkpoint cannot be used for an unfinished evaluation')
         trained = json.loads((stage / 'trained.json').read_text())
         if (stage / 'evaluated.json').exists():
             row = json.loads((stage / 'evaluated.json').read_text())['row']
@@ -165,6 +173,8 @@ class Lane:
         matrix = json.loads(path.read_text()) if path.exists() else {}
         matrix[str(task)] = row
         write_json(path, matrix)
+        if live_checkpoint:
+            after_evaluation(stage.parent, task, steps_per_task, episodes)
         print('STAGE_DONE', method, suite, task, json.dumps(row), flush=True)
 
     def entry_check(self):
@@ -203,6 +213,7 @@ def main():
     modes.add_argument('--preflight', action='store_true', help='ER: two tasks, five steps/task, two episodes/cell')
     modes.add_argument('--chain-check', action='store_true', help='Synthetic scheduler handoff; no training')
     modes.add_argument('--entry-check', action='store_true', help='Short GPU/EGL/port check without training')
+    p.add_argument('--save-trainable-snapshots', action='store_true')
     p.add_argument('--tasks', type=int, default=10, choices=range(1, 11))
     a = p.parse_args()
     if a.preflight and a.method != 'er': p.error('--preflight requires --method er')
@@ -210,7 +221,7 @@ def main():
     install_signal_handlers()
     RUN.mkdir(parents=True, exist_ok=True)
     mode = 'chain_checks' if a.chain_check else 'entry_checks' if a.entry_check else 'preflight' if a.preflight else 'formal'
-    lane = Lane(a.method, a.suite, mode)
+    lane = Lane(a.method, a.suite, mode, a.save_trainable_snapshots)
     with stream_lock(lane.stream):
         try:
             check_predecessor(lane.stream, os.environ.get('V1_PREDECESSOR_JOB_ID'))
@@ -221,6 +232,7 @@ def main():
             if a.entry_check:
                 lane.entry_check()
                 return
+            ensure_policy(lane.stream, a.save_trainable_snapshots)
             tasks = 2 if a.preflight else a.tasks
             steps, episodes = (5, 2) if a.preflight else (10000, 50)
             actions = [stage_action(lane.stream / f'task{task:02d}', task, steps, episodes) for task in range(tasks)]

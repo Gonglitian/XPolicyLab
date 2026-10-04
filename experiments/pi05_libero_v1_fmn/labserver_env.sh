@@ -1,6 +1,7 @@
 # Source in a fresh shell. All machine-specific paths are configurable via V1_*.
 export V1_ROOT="${V1_ROOT:-/data2/vla-reasoning/proj}"
 export V1_ASSETS="${V1_ASSETS:-$V1_ROOT/XPolicyLab-assets}"
+export V1_STORAGE_ROOT=/data2
 # Separate output from the retained baseline archive.
 export V1_RUN="${V1_RUN:-$V1_ASSETS/baselines/pi05_libero_v1_fmn_portable}"
 export V1_OPENPI="${V1_OPENPI:-$V1_ROOT/XPolicyLab-upstreams/openpi-robocasa}"

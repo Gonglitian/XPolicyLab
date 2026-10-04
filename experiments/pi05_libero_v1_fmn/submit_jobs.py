@@ -76,6 +76,7 @@ def main():
     mode.add_argument('--entry-check', action='store_true')
     mode.add_argument('--chain-check', action='store_true', help='Synthetic handoff only; no model training')
     parser.add_argument('--chain-next', action='store_true', help='Submit exactly one afterany continuation')
+    parser.add_argument('--save-trainable-snapshots', action='store_true', help='Keep per-task trainable parameters for probes; default off')
     parser.add_argument('--tasks', type=int, default=10, choices=range(1, 11))
     args = parser.parse_args()
     if args.preflight and args.method != 'er': parser.error('--preflight requires er')
@@ -95,11 +96,12 @@ def main():
     if args.preflight: command.append('--preflight')
     if args.entry_check: command.append('--entry-check')
     if args.chain_check: command.append('--chain-check')
+    if args.save_trainable_snapshots: command.append('--save-trainable-snapshots')
     first, second = submit_pair(command, env, args.chain_next)
     record = dict(first_job=first, continuation_job=second, dependency=f'afterany:{first}' if second else None,
                   commit=commit, code=env['V1_CODE'], run=str(run), method=args.method, suite=args.suite,
                   tasks=args.tasks, preflight=args.preflight, entry_check=args.entry_check,
-                  chain_check=args.chain_check, submitted_at=time.time())
+                  chain_check=args.chain_check, save_trainable_snapshots=args.save_trainable_snapshots, submitted_at=time.time())
     (logs / f'submission_{first}.json').write_text(json.dumps(record, indent=2) + '\n')
     print('SUBMISSION', json.dumps(record), flush=True)
 

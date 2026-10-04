@@ -13,10 +13,28 @@ export HUGGINGFACE_HUB_CACHE="$HF_HUB_CACHE" TRANSFORMERS_CACHE="$HF_HOME/transf
 export OPENPI_DATA_HOME="${V1_OPENPI_DATA_HOME:-$V1_CACHE/openpi}"
 export XDG_CACHE_HOME="$V1_CACHE/xdg" TORCH_HOME="$V1_CACHE/torch"
 export TRITON_CACHE_DIR="$V1_CACHE/triton" CUDA_CACHE_PATH="$V1_CACHE/cuda"
+export PIP_CACHE_DIR="$V1_CACHE/pip" UV_CACHE_DIR="$V1_CACHE/uv"
+export MPLCONFIGDIR="$V1_CACHE/matplotlib" NUMBA_CACHE_DIR="$V1_CACHE/numba"
 export JAX_COMPILATION_CACHE_DIR="$V1_JAX_CACHE"
 export V1_DOWNLOAD_LOG="${V1_DOWNLOAD_LOG:-$V1_ASSETS/datasets/dl_libero256.log}"
 v1_prepare_dirs() {
+    # labserver forbids cache/output fallback onto the root partition. Resolve symlinks too.
+    if [ -n "${V1_STORAGE_ROOT:-}" ]; then
+        local value resolved allowed
+        allowed="$(readlink -m -- "$V1_STORAGE_ROOT")"
+        for value in "$V1_RUN" "$TMPDIR" "$HF_HOME" "$OPENPI_DATA_HOME" "$V1_CACHE" "$V1_JAX_CACHE" \
+            "$HF_HUB_CACHE" "$HF_DATASETS_CACHE" "$TRANSFORMERS_CACHE" "$XDG_CACHE_HOME" \
+            "$TORCH_HOME" "$TRITON_CACHE_DIR" "$CUDA_CACHE_PATH" "$PIP_CACHE_DIR" \
+            "$UV_CACHE_DIR" "$MPLCONFIGDIR" "$NUMBA_CACHE_DIR"; do
+            resolved="$(readlink -m -- "$value")"
+            case "$resolved" in
+                "$allowed"/*) ;;
+                *) echo "Storage path must stay under $allowed: $value" >&2; return 2 ;;
+            esac
+        done
+    fi
     mkdir -p "$V1_RUN" "$TMPDIR" "$HF_HOME" "$HF_HUB_CACHE" "$HF_DATASETS_CACHE" \
         "$OPENPI_DATA_HOME" "$XDG_CACHE_HOME" "$TORCH_HOME" "$TRITON_CACHE_DIR" \
-        "$CUDA_CACHE_PATH" "$V1_JAX_CACHE" "$TRANSFORMERS_CACHE"
+        "$CUDA_CACHE_PATH" "$V1_JAX_CACHE" "$TRANSFORMERS_CACHE" \
+        "$PIP_CACHE_DIR" "$UV_CACHE_DIR" "$MPLCONFIGDIR" "$NUMBA_CACHE_DIR"
 }
