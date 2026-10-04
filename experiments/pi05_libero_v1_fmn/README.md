@@ -8,12 +8,67 @@
 
 ## 当前范围
 
-已完成代码入库、labserver/BCC 配置和可迁移路径。单卡单流 Slurm 入口、
-GPU guard 移除、动态端口、跨作业 GPU 验证与快照/清理仍是后续工作。
-所有训练、模型服务及仿真渲染必须在 Slurm 作业内运行。
-`pipeline.sh` 和 `gate_then_launch.sh` 是原多 lane 流程，现已要求 Slurm allocation，
-但仍保留旧 GPU 编号调度，不能作为新的单卡提交入口；本步不提供 GPU 启动命令。
-`stop_at_boundary.py` 是历史迁移辅助工具，现要求显式 `--lanes-json`，不再携带旧 PID。
+已完成代码入库、机器配置/路径迁移，以及 labserver 单卡单流 Slurm 入口。
+每个作业申请一张 GPU，依次执行准备、训练、模型服务和仿真评测，所有子进程留在
+同一个 Slurm step/cgroup 中。程序继承 Slurm 的 CUDA_VISIBLE_DEVICES，不接受物理 GPU 编号。
+GPU 空闲与排队由 Slurm 负责；已移除 wait_idle、GPU guard 和退出码 75 的等待重试。
+
+完整两任务训练冒烟、1 万步/50 次单任务评测、scancel 训练恢复、跨作业接续排队、
+checkpoint 清理和可训练参数快照仍属于后续任务。当前入口检查不等同于这些验收。
+
+## Slurm 提交（labserver）
+
+在仓库根目录执行；默认 gpu 分区、1 GPU、12 CPU、60G 主机内存、3 天时限：
+
+```bash
+# 一条正式 SeqFT Spatial 流；输出作业号，由 Slurm 分配空闲 GPU。
+bash experiments/pi05_libero_v1_fmn/submit.sh sf libero_spatial
+
+# 仅训练并评测第一个任务（1 万步、50 次评测），用于后续验收。
+bash experiments/pi05_libero_v1_fmn/submit.sh sf libero_spatial --tasks 1
+
+# ER 两任务预检：每任务 5 步，每个已见任务 2 次评测。
+bash experiments/pi05_libero_v1_fmn/submit.sh er libero_spatial --preflight
+
+# 轻量入口检查：小型 JAX GPU 运算、4 个真实 WebSocket 服务、LIBERO 256px 渲染。
+# 不训练模型、不加载模型权重，不产生成功率结论。
+V1_SLURM_PARTITION=debug V1_SLURM_TIME=00:10:00 \
+V1_SLURM_CPUS=4 V1_SLURM_MEM=16G \
+bash experiments/pi05_libero_v1_fmn/submit.sh sf libero_spatial --entry-check
+
+squeue -u "$USER"
+scontrol show job JOB_ID
+scancel JOB_ID
+```
+
+不要因为 Slurm 仍显示 PENDING 就在 SSH 终端直接启动训练。内存或 CPU 也可能造成排队，
+即使部分 GPU 没有分配。debug 最长 30 分钟，完整预检含编译和模型加载，可能超时，
+因此完整预检默认仍提交 gpu 分区。`--tasks` 指从任务 0 开始共执行多少个任务；已完成的会跳过。
+
+`submit.sh` 加载机器配置、创建日志目录并调用 sbatch；`labserver.sbatch` 在作业内重新加载
+配置，用 `eval "$(conda shell.bash hook)"` 初始化 Conda 后再 activate，然后用 srun 启动 lane。
+labserver 默认激活 base 作为脚本环境，训练和仿真仍使用各自的 `V1_PI_PY` / `V1_SIM_PY`。
+若不需要 Conda，显式设置 `V1_CONDA_ENV=''`。不要直接提交缺少 V1_CODE 的 sbatch 文件。
+
+可用 `V1_SLURM_PARTITION`、`V1_SLURM_TIME`、`V1_SLURM_CPUS`、`V1_SLURM_MEM` 覆盖资源配置；
+GPU 数固定为 1。通过 `V1_RUN` 分开不同重复实验。`pipeline.sh` 现在只转发到 `submit.sh`；
+旧 `gate_then_launch.sh` 会报错提示使用新入口，`stop_at_boundary.py` 和 `gpu_guard.py` 已退役删除。
+BCC/HPCC 的分区、账号等资源规则尚未验证，当前提交脚本的默认值仅针对 labserver。
+
+## 锁、端口、状态与日志
+
+- 每条流目录里的 `stream.lock` 是内核 flock：重复提交同一输出流会快速失败，进程退出后自动释放。
+  文件可以留在磁盘，不代表锁仍被占用，也不要通过删除文件解锁。
+- 每次运行写 `status_job_<job_id>.json`，各作业互不覆盖；preflight 和入口检查使用独立子目录。
+- 每个 policy server 用端口 0 让操作系统直接绑定空闲端口，成功监听后才写出带 PID/job ID 的就绪记录。
+  不存在“找空闲端口后先释放再绑定”的竞争窗口，每个评测客户端独占一个服务。
+- EGL 在 Slurm cgroup 内识别唯一可初始化的 NVIDIA 设备，不假定 EGL 编号等于 CUDA 编号。
+  若无法唯一确定，作业报错停止，不使用未分配的 GPU。
+- 调度日志在 `$V1_RUN/slurm/<job-name>-<job-id>.log`；流内保留训练和评测子进程日志。
+  评测失败会保留已完成 episode 记录，重新提交时读取这些记录。
+- 信号会中断调度并清理子进程；完整 checkpoint 保存在原有的每 1000 步间隔和任务结束点。
+  本步没有新增“取消时立即存盘”或自动接续作业功能。
+- 本机 Slurm accounting 当前关闭，sacct 不可用；以 squeue/scontrol、Slurm 日志和状态 JSON 为准。
 
 ## 两份机器配置
 
@@ -31,7 +86,7 @@ source experiments/pi05_libero_v1_fmn/bcc_env.sh
 "$V1_PI_PY" experiments/pi05_libero_v1_fmn/check_paths.py
 ```
 
-这些是配置/检查命令，不是 Slurm 提交命令。Slurm 命令会在下一步加入。
+这些是配置/检查命令；labserver 的 Slurm 提交命令见上文。
 机器配置可在 source 前使用同名 `V1_*` 变量覆盖，例如：
 
 ```bash
@@ -76,7 +131,7 @@ HPCC 的真实路径需要 Litian 提供；同一 commit 可通过配置覆盖�
 训练衔接和评测加载均在当前流目录解析它。旧绝对 checkpoint 记录按
 `方法/套件/taskXX/checkpoints/...` 识别并映射到当前流；即使原地址仍存在，也不会回退读取原地址。
 缺失、目录越界、方法或任务不匹配时直接报错。完整性检查只确认 `params` 和 `train_state`
-目录存在，真正的 Orbax 恢复及学习率/Adam 连续性仍需 Slurm 测试验证。
+目录存在，真正的 Orbax 恢复及学习率/Adam 连续性仍需后续完整 Slurm 训练测试验证。
 
 新 manifest 的 `episode_files` 相对于 `V1_DATA`。旧 manifest 的标准
 `data/chunk-NNN/*.parquet` 路径自动映射到新数据根目录；其他旧布局需设置
@@ -102,4 +157,13 @@ PYTHONDONTWRITEBYTECODE=1 "$V1_PI_PY" -m unittest discover \
 
 测试覆盖新旧 checkpoint 迁移、原地址仍存在时优先新流、旧 manifest 兼容、
 目录越界、符号链接、环境覆盖、流自带 metadata、评测加载路径和已评测任务跳过。
-这些 CPU 检查不代表 BCC/HPCC 已验证，也不代表 Slurm 训练/评测验收已完成。
+这些 CPU 检查不代表 BCC/HPCC 已验证，也不代表完整 Slurm 训练/评测验收已完成。
+
+## 已执行的 Slurm 入口验证
+
+作业 **980**：debug 分区，1 GPU / 4 CPU / 16G，COMPLETED，ExitCode=0:0，耗时 66 秒。
+JAX 只看到 `cuda:0` 并完成小型运算；4 个系统动态端口上的真实 WebSocket 服务均收到
+`probe-ok` 响应；LIBERO 生成了 256x256 RGB 图像。policy 和 simulator 的进程均位于
+`job_980/step_0` cgroup。证据见 [validation/slurm_entry_980.json](validation/slurm_entry_980.json)。
+这次未加载 pi0.5 checkpoint、未训练模型；不作为完整冒烟、训练成功率、训练中断恢复
+或两条训练流并行的验收证据。BCC/HPCC 尚未实机验证。

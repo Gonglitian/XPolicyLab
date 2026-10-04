@@ -1,0 +1,50 @@
+{
+  "scope": "Slurm entry only: no training, checkpoint restore, success-rate or full parallel-smoke claim",
+  "job_id": 980,
+  "scheduler": "JobId=980 JobName=v1_sf_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=COMPLETED Reason=None Dependency=(null)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:01:06 TimeLimit=00:10:00 TimeMin=N/A\n   SubmitTime=2026-10-03T23:29:50 EligibleTime=2026-10-03T23:29:50\n   AccrueTime=2026-10-03T23:29:50\n   StartTime=2026-10-03T23:29:50 EndTime=2026-10-03T23:30:56 Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-03T23:29:50 Scheduler=Main\n   Partition=debug AllocNode:Sid=ucrtasl:2785454\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=ucrtasl\n   BatchHost=ucrtasl\n   NumNodes=1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=4,mem=16G,node=1,billing=4\n   AllocTRES=cpu=4,mem=16G,node=1,billing=4\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=4 MinMemoryNode=16G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --parsable --partition=debug --time=00:10:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=4 --mem=16G --job-name=v1_sf_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_fmn_portable/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method sf --suite libero_spatial --entry-check\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_fmn_portable/slurm/v1_sf_libero_spatial-980.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=4\n\n",
+  "status": {
+    "phase": "entry_check_passed",
+    "timestamp": 1791095456.1289136,
+    "pid": 2786144,
+    "job_id": "980",
+    "cuda_visible_devices": "0",
+    "mode": "entry_checks"
+  },
+  "policy": {
+    "devices": [
+      "cuda:0"
+    ],
+    "sum": 256.0,
+    "ports": [
+      44957,
+      37587,
+      43043,
+      44853
+    ],
+    "responses": [
+      "probe-ok",
+      "probe-ok",
+      "probe-ok",
+      "probe-ok"
+    ],
+    "job_id": "980",
+    "pid": 2786158,
+    "role": "policy",
+    "cuda_visible_devices": "0",
+    "cgroup": "0::/system.slice/slurmstepd.scope/job_980/step_0/user/task_0\n"
+  },
+  "simulator": {
+    "egl_device": 0,
+    "image_shape": [
+      256,
+      256,
+      3
+    ],
+    "image_mean": 119.6024169921875,
+    "job_id": "980",
+    "pid": 2787537,
+    "role": "sim",
+    "cuda_visible_devices": "0",
+    "cgroup": "0::/system.slice/slurmstepd.scope/job_980/step_0/user/task_0\n"
+  }
+}

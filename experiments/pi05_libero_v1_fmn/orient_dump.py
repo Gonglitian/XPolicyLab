@@ -1,4 +1,6 @@
 """(openpi env) Dump the first frame of the first 10 episodes of task 0 per suite for the orientation check."""
+from slurm_runtime import require_slurm
+require_slurm()
 import io, json
 import numpy as np
 from PIL import Image

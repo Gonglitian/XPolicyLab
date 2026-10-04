@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 from common import (OPENPI, RUN, STEPS_PER_TASK, CURRENT_BATCH, REPLAY_PER_TASK, LeRobotTask,
                     make_config, load_norm, write_json, load_manifest, ensure_stream_metadata)
-from gpu_guard import Guard
+from slurm_runtime import require_slurm
 from paths import resolve_checkpoint, relative_path
 
 def main():
@@ -23,6 +23,7 @@ def main():
     p.add_argument('--root', type=Path, default=RUN)
     p.add_argument('--preflight', action='store_true')
     args = p.parse_args()
+    require_slurm()
     import jax
     import jax.numpy as jnp
     import flax.traverse_util
@@ -31,7 +32,7 @@ def main():
     from openpi.models.model import Observation
     logging.basicConfig(level=logging.INFO)
     np.random.seed(42)
-    assert jax.device_count() == 1, jax.devices()
+    assert jax.device_count() == 1 and jax.devices()[0].platform == 'gpu', jax.devices()
     spt = args.steps_per_task
     stream = args.root / args.method / args.suite
     stage = stream / f'task{args.task:02d}'
@@ -132,7 +133,6 @@ def main():
             next(replay_iter)
     began = interval = time.monotonic()
     losses, grads = [], []
-    gpu_guard = Guard(os.environ['CUDA_VISIBLE_DEVICES'].split(','))
     for step in range(start, end_step):
         batch = next(current_iter)
         if replay_iter is not None:
@@ -152,22 +152,16 @@ def main():
                 seconds_per_step=(now - interval) / len(losses), elapsed_seconds=now - began,
                 gpu_mib_in_use=int(jax.devices()[0].memory_stats().get('bytes_in_use', 0) // 2**20),
                 gpu_mib_peak=int(jax.devices()[0].memory_stats().get('peak_bytes_in_use', 0) // 2**20),
-                timestamp=time.time(), method=args.method, suite=args.suite, task=args.task,
-                gpu_contention=gpu_guard.conflict is not None)
+                timestamp=time.time(), method=args.method, suite=args.suite, task=args.task, job_id=os.environ['SLURM_JOB_ID'])
             with (stage / 'metrics.jsonl').open('a') as f:
                 f.write(json.dumps(record) + '\n')
             write_json(stage / 'progress.json', record)
             print('TRAIN_PROGRESS', json.dumps(record), flush=True)
             interval = time.monotonic()
             losses, grads = [], []
-        if completed % 1000 == 0 or completed == end_step or gpu_guard.conflict:
+        if completed % 1000 == 0 or completed == end_step:
             checkpoints.save_state(manager, state, saved_loader, completed)
             manager.wait_until_finished()
-        if gpu_guard.conflict:
-            write_json(stage / 'gpu_pause.json', dict(step=completed, reason=gpu_guard.conflict))
-            gpu_guard.close()
-            manager.close()
-            raise SystemExit(75)
     assert int(state.step) == end_step
     manager.wait_until_finished()
     checkpoint = config.checkpoint_dir / str(end_step)
@@ -179,7 +173,6 @@ def main():
     write_json(stage / 'trained.json', dict(checkpoint=relative_path(checkpoint, stream), checkpoint_path_base='stream', begin_step=begin_step, end_step=end_step,
         seconds=time.monotonic() - began, finished_at=time.time(), preflight=args.preflight))
     manager.close()
-    gpu_guard.close()
     print('STAGE_TRAINED', checkpoint, flush=True)
 
 if __name__ == '__main__':

@@ -1,5 +1,7 @@
 """(simulator env, frames dumped by orient_dump.py) Empirical orientation check: dataset frames should match the evaluation input, i.e. the
 simulator render rotated 180 deg (openpi LIBERO recipe), and NOT the raw render."""
+from egl_device import configure_egl
+configure_egl()
 import io, json
 import numpy as np
 from PIL import Image

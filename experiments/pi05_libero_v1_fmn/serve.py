@@ -1,9 +1,12 @@
 """Serve a v1 checkpoint with its own saved normalization (same model config as training)."""
 import argparse
 import asyncio
+from slurm_runtime import require_slurm
+require_slurm()
 import jax
 from pathlib import Path
-from common import make_config
+from common import make_config, write_json
+import os
 from openpi.shared import normalize
 from openpi.policies import policy_config
 from XPolicyLab.policy.Pi_05.model import Model as BaseModel
@@ -29,9 +32,18 @@ class Model(BaseModel):
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--checkpoint', type=Path, required=True)
-    p.add_argument('--port', type=int, required=True)
+    p.add_argument('--port', type=int, default=0)
+    p.add_argument('--ready-file', type=Path, required=True)
     a = p.parse_args()
     model = Model(a.checkpoint)
     print('POLICY_LOADED', str(a.checkpoint), flush=True)
-    asyncio.run(PolicyServer(model, PolicyServerConfig(host='127.0.0.1', port=a.port,
-        ws_ping_timeout_s=600)).serve_forever())
+    async def run():
+        server = PolicyServer(model, PolicyServerConfig(host='127.0.0.1', port=a.port, ws_ping_timeout_s=600))
+        await server.start()  # port=0 binds an OS-assigned port before publishing it
+        try:
+            write_json(a.ready_file, dict(port=int(server.url.rsplit(':', 1)[1]),
+                       pid=os.getpid(), job_id=os.environ['SLURM_JOB_ID']))
+            await server.serve_forever()
+        finally:
+            await server.stop()
+    asyncio.run(run())

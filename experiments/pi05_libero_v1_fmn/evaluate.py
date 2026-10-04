@@ -1,4 +1,6 @@
 """Evaluate each fixed initial-state index once (v1: same protocol as v0); simulator errors fail the job."""
+from egl_device import configure_egl
+configure_egl()
 import argparse
 import hashlib
 import json
