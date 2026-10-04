@@ -13,6 +13,7 @@ from common import (OPENPI, RUN, STEPS_PER_TASK, CURRENT_BATCH, REPLAY_PER_TASK,
                     make_config, load_norm, write_json, load_manifest, ensure_stream_metadata)
 from slurm_runtime import require_slurm
 from paths import resolve_checkpoint, relative_path
+from resume import latest_complete_step
 
 def main():
     p = argparse.ArgumentParser()
@@ -72,14 +73,19 @@ def main():
     manager, resuming = checkpoints.initialize_checkpoint_dir(config.checkpoint_dir,
         keep_period=None, overwrite=False, resume=config.checkpoint_dir.exists())
     train_rng, init_rng = jax.random.split(jax.random.key(42))
-    if resuming:
+    resume_step = latest_complete_step(manager.all_steps(), config.checkpoint_dir, begin_step, end_step)
+    source_checkpoint = None
+    if resume_step is not None:
         source = 'resume_same_task'
         state, state_sharding = native.init_train_state(config, init_rng, mesh, resume=True)
-        state = checkpoints.restore_state(manager, state, saved_loader)
+        state = checkpoints.restore_state(manager, state, saved_loader, step=resume_step)
+        assert int(state.step) == resume_step
+        source_checkpoint = relative_path(config.checkpoint_dir / str(resume_step), stream)
     elif args.task:
         source = 'carry_from_previous_task'
         prev_trained = json.loads((previous / 'trained.json').read_text())
         assert prev_trained['end_step'] == begin_step, prev_trained
+        source_checkpoint = relative_path(resolve_checkpoint(stream, prev_trained['checkpoint'], args.task - 1), stream)
         prev_manager, ok = checkpoints.initialize_checkpoint_dir(resolve_checkpoint(stream, prev_trained['checkpoint'], args.task - 1).parent,
             keep_period=None, overwrite=False, resume=True)
         assert ok, 'previous task checkpoint missing'
@@ -100,6 +106,15 @@ def main():
                              if hasattr(x, 'dtype') and jnp.issubdtype(x.dtype, jnp.floating)) ** 0.5)
     start = int(state.step)
     assert begin_step <= start <= end_step, (start, begin_step, end_step)
+    if start > 0:
+        assert moment_norm > 0, 'resumed/carried Adam moments unexpectedly zero'
+    resume_record = dict(job_id=os.environ['SLURM_JOB_ID'], code_commit=os.environ.get('V1_CODE_COMMIT'),
+                         timestamp=time.time(), source=source, checkpoint=source_checkpoint,
+                         start_step=start, task_step=start - begin_step,
+                         lr_at_start=float(config.lr_schedule.create()(start)), optimizer_moment_norm=moment_norm)
+    with (stage / 'resume_history.jsonl').open('a') as log:
+        log.write(json.dumps(resume_record) + '\n')
+    print('RESUME_STATE', json.dumps(resume_record), flush=True)
     leaves = flax.traverse_util.flatten_dict(state.params.filter(config.trainable_filter).to_pure_dict(), sep='/')
     keys = list(leaves)
     assert any('lora' in k for k in keys), 'LoRA must train'
@@ -113,6 +128,8 @@ def main():
         fsdp_devices=config.fsdp_devices, model=str(config.model), optimizer=str(config.optimizer),
         lr_schedule=str(config.lr_schedule), lr_at_begin=float(config.lr_schedule.create()(begin_step)),
         lr_at_end=float(config.lr_schedule.create()(end_step)),
+        lr_at_start=float(config.lr_schedule.create()(start)), resume_checkpoint=source_checkpoint,
+        job_id=os.environ['SLURM_JOB_ID'], code_commit=os.environ.get('V1_CODE_COMMIT'),
         normalization='suite-level mean/std, computed once over all 10 tasks (FMN-style)',
         data='physical-intelligence/libero 256px no-noops, no extra flip',
         trainable_parameters=sum(int(np.prod(v.shape)) for v in leaves.values()),

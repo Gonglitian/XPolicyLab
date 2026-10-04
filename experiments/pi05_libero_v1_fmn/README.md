@@ -13,8 +13,7 @@
 同一个 Slurm step/cgroup 中。程序继承 Slurm 的 CUDA_VISIBLE_DEVICES，不接受物理 GPU 编号。
 GPU 空闲与排队由 Slurm 负责；已移除 wait_idle、GPU guard 和退出码 75 的等待重试。
 
-完整两任务训练冒烟、1 万步/50 次单任务评测、scancel 训练恢复、跨作业接续排队、
-checkpoint 清理和可训练参数快照仍属于后续任务。当前入口检查不等同于这些验收。
+完整两任务训练冒烟、1 万步/50 次单任务评测、scancel 训练恢复、checkpoint 清理和可训练参数快照仍属于后续任务。当前入口检查不等同于这些验收。
 
 ## Slurm 提交（labserver）
 
@@ -45,7 +44,7 @@ scancel JOB_ID
 即使部分 GPU 没有分配。debug 最长 30 分钟，完整预检含编译和模型加载，可能超时，
 因此完整预检默认仍提交 gpu 分区。`--tasks` 指从任务 0 开始共执行多少个任务；已完成的会跳过。
 
-`submit.sh` 加载机器配置、创建日志目录并调用 sbatch；`labserver.sbatch` 在作业内重新加载
+`submit.sh` 加载机器配置，`submit_jobs.py` 固定代码版本并调用 sbatch；`labserver.sbatch` 在作业内重新加载
 配置，用 `eval "$(conda shell.bash hook)"` 初始化 Conda 后再 activate，然后用 srun 启动 lane。
 labserver 默认激活 base 作为脚本环境，训练和仿真仍使用各自的 `V1_PI_PY` / `V1_SIM_PY`。
 若不需要 Conda，显式设置 `V1_CONDA_ENV=''`。不要直接提交缺少 V1_CODE 的 sbatch 文件。
@@ -67,7 +66,7 @@ BCC/HPCC 的分区、账号等资源规则尚未验证，当前提交脚本的�
 - 调度日志在 `$V1_RUN/slurm/<job-name>-<job-id>.log`；流内保留训练和评测子进程日志。
   评测失败会保留已完成 episode 记录，重新提交时读取这些记录。
 - 信号会中断调度并清理子进程；完整 checkpoint 保存在原有的每 1000 步间隔和任务结束点。
-  本步没有新增“取消时立即存盘”或自动接续作业功能。
+  没有新增“取消时立即存盘”；自动接续作业见下文。
 - 本机 Slurm accounting 当前关闭，sacct 不可用；以 squeue/scontrol、Slurm 日志和状态 JSON 为准。
 
 ## 两份机器配置
@@ -167,3 +166,56 @@ JAX 只看到 `cuda:0` 并完成小型运算；4 个系统动态端口上的真�
 `job_980/step_0` cgroup。证据见 [validation/slurm_entry_980.json](validation/slurm_entry_980.json)。
 这次未加载 pi0.5 checkpoint、未训练模型；不作为完整冒烟、训练成功率、训练中断恢复
 或两条训练流并行的验收证据。BCC/HPCC 尚未实机验证。
+
+## 跨作业续跑和一个接续作业
+
+```bash
+# 一次提交两个作业，第二个依赖第一个结束（afterany）。
+bash experiments/pi05_libero_v1_fmn/submit.sh er libero_spatial --chain-next
+
+# 只重新提交一次；保持 V1_RUN、方法、套件与预检模式一致。
+bash experiments/pi05_libero_v1_fmn/submit.sh er libero_spatial
+```
+
+提交输出列出两个 job ID，记录保存在 `$V1_RUN/slurm/submission_<first_job>.json`。
+`--chain-next` 只排一个接续作业，不无限重提。依赖是 afterany，成功、超时或取消之后都
+能解除依赖，但仍须等待资源；不要使用只接受成功退出的 afterok。若要彻底停止这对作业，
+执行 `scancel FIRST_JOB NEXT_JOB`，只取消第一个会让接续作业获得运行资格。
+
+接续作业会检查前一个作业的流内状态：明确的 failed 状态或缺失状态会报错退出，
+要求先排查；被中断或被系统终止后留下的训练/评测状态可以继续。提交第二个作业失败时，
+错误会明确报告第一个已提交的 job ID，不会悄悄取消或重复提交它。
+
+每次提交使用当前 **已提交的 HEAD** 在 `$V1_RUN/code_snapshots/<commit>/XPolicyLab`
+生成源码快照。同一对作业使用完全相同的快照、机器配置和输出目录，之后修改工作区不会
+影响它们。实验目录/机器配置有未提交修改时拒绝提交。仓库其他文件的未提交改动不会进入
+快照；若实验需要它们，先有选择地提交。外部 openpi、Python 环境和数据不复制，也必须保持
+兼容；不能在运行过程中替换外部依赖。快照只保存代码，不保存数据和权重。
+
+恢复规则：
+
+- `trained.json` 和完整的 `evaluated.json` 都存在、协议一致：跳过任务，即使旧 checkpoint 已清理。
+- 训练完成、评测未完成：只补评测，保留已完成 episode 记录。
+- 任务训练未完成：仅从 Orbax 返回的 finalized checkpoint 中取最新一步，恢复完整参数、
+  optimizer 状态及全局 step。未完成的临时保存目录不参与选择。最终保存目录缺失组件时会报错，
+  不静默重置训练；完全没有 checkpoint 时才从底座/上一任务重新开始该任务。
+- 不重新 warmup；学习率按恢复的 global step 计算。起始步数大于 0 时检查 Adam 动量范数非零。
+- 每次启动在 `resume_history.jsonl` 和训练日志 `RESUME_STATE` 中记录来源、checkpoint、
+  job ID、commit、起始全局/任务步数、实际起始学习率和 Adam 动量范数。
+- 已完成整条请求流时，接续作业只检查并跳过任务，不重新准备数据或训练。
+
+每 1000 步及任务末保存一次，取消/超时后未保存的尾部需要重算。真正恢复时仍由 Orbax
+检查 checkpoint 内容；本步的 CPU 测试不替代后续完整模型的 scancel/恢复验收。
+
+### 合成接续调度检查（非训练验收）
+
+```bash
+# 使用全新 V1_RUN。第一个作业写入小型 JSON 后故意退出 99；第二个读取并推进它。
+V1_RUN=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/my_chain_check \
+V1_SLURM_PARTITION=debug V1_SLURM_TIME=00:02:00 \
+V1_SLURM_CPUS=1 V1_SLURM_MEM=2G \
+bash experiments/pi05_libero_v1_fmn/submit.sh er libero_spatial --chain-next --chain-check
+```
+
+该模式仅验证真实 Slurm 的 afterany 依赖、顺序启动、同一代码版本和共享进度交接。
+小型 JSON 不是模型 checkpoint，没有训练、Adam 或学习率恢复证据，也不是三天超时实测。

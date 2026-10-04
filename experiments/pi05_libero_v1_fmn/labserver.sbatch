@@ -20,6 +20,6 @@ if [ -n "${V1_CONDA_ENV:-}" ]; then
 fi
 export PYTHONDONTWRITEBYTECODE=1
 # Do not assign CUDA_VISIBLE_DEVICES: srun sets it from the allocation.
-echo "SLURM_JOB_ID=$SLURM_JOB_ID host=$(hostname) code=$V1_CODE"
+echo "SLURM_JOB_ID=$SLURM_JOB_ID host=$(hostname) code=$V1_CODE commit=${V1_CODE_COMMIT:-unknown} predecessor=${V1_PREDECESSOR_JOB_ID:-none}"
 exec srun --ntasks=1 --gres=gpu:1 --kill-on-bad-exit=1 \
     "$V1_PI_PY" "$V1_CODE/lane.py" "$@"

@@ -108,7 +108,7 @@ class PortablePathsTest(unittest.TestCase):
         stream = root / 'sf/libero_spatial'
         expected = self.checkpoint(stream)
         stage = stream / 'task00'
-        common.write_json(stage / 'trained.json', {'checkpoint': '/old/sf/libero_spatial/task00/checkpoints/pi05_libero_cl/stage/10000'})
+        common.write_json(stage / 'trained.json', {'checkpoint': '/old/sf/libero_spatial/task00/checkpoints/pi05_libero_cl/stage/10000', 'end_step': 10000})
         lane = Lane('sf', 'libero_spatial')
         with patch.object(lane, 'status'), patch.object(lane, 'evaluate', return_value={'0': 1.0}) as evaluate:
             lane.stage(root, 'sf', 'libero_spatial', 0, 10000, 50)
@@ -119,8 +119,8 @@ class PortablePathsTest(unittest.TestCase):
         from lane import Lane
         root = self.root / 'runs'
         stage = root / 'sf/libero_spatial/task00'
-        common.write_json(stage / 'trained.json', {'checkpoint': 'task00/checkpoints/pruned/10000'})
-        common.write_json(stage / 'evaluated.json', {'row': {'0': 0.98}})
+        common.write_json(stage / 'trained.json', {'checkpoint': 'task00/checkpoints/pruned/10000', 'end_step': 10000})
+        common.write_json(stage / 'evaluated.json', {'row': {'0': 0.98}, 'episodes': 50})
         lane = Lane('sf', 'libero_spatial')
         with patch.object(lane, 'evaluate') as evaluate, patch.object(lane, 'run_logged') as train:
             lane.stage(root, 'sf', 'libero_spatial', 0, 10000, 50)

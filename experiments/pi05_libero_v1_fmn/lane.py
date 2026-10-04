@@ -11,6 +11,7 @@ from pathlib import Path
 from common import RUN, SUITES, write_json
 from paths import CODE, REPO, OPENPI, configured_path, resolve_checkpoint
 from slurm_runtime import require_slurm, stream_lock, install_signal_handlers, stop_processes, wait_ready
+from resume import stage_action, check_predecessor
 
 PI_PY = configured_path('V1_PI_PY')
 SIM_PY = configured_path('V1_SIM_PY')
@@ -54,7 +55,9 @@ class Lane:
 
     def status(self, phase, **extra):
         record = dict(phase=phase, timestamp=time.time(), pid=os.getpid(), job_id=self.job_id,
-                      cuda_visible_devices=os.environ.get('CUDA_VISIBLE_DEVICES'), mode=self.mode, **extra)
+                      cuda_visible_devices=os.environ.get('CUDA_VISIBLE_DEVICES'), mode=self.mode,
+                      code_commit=os.environ.get('V1_CODE_COMMIT'),
+                      predecessor_job_id=os.environ.get('V1_PREDECESSOR_JOB_ID'), **extra)
         write_json(self.status_path, record)
         print('LANE_STATUS', json.dumps(record), flush=True)
 
@@ -71,6 +74,9 @@ class Lane:
                 stop_processes([proc])
 
     def prepare(self):
+        metadata = self.stream / 'metadata'
+        if (metadata / 'manifest.json').is_file() and (metadata / 'norm' / self.suite / 'norm_stats.json').is_file():
+            return  # relocated stream already carries its exact training metadata
         # Different streams may share preparation outputs. Serialize writers.
         with (RUN / 'prepare.lock').open('a+') as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
@@ -138,7 +144,10 @@ class Lane:
 
     def stage(self, root, method, suite, task, steps_per_task, episodes, preflight=False):
         stage = root / method / suite / f'task{task:02d}'
-        if not (stage / 'trained.json').exists():
+        action = stage_action(stage, task, steps_per_task, episodes)
+        if action == 'skip':
+            print('STAGE_SKIPPED', method, suite, task, flush=True)
+        if action == 'train':
             self.status('training', method=method, suite=suite, task=task, stage_dir=str(stage), preflight=preflight)
             command = [PI_PY, CODE / 'train_stage.py', '--method', method, '--suite', suite, '--task', task,
                        '--steps-per-task', steps_per_task, '--root', root]
@@ -166,6 +175,25 @@ class Lane:
                             self.stream / f'{role}_job_{self.job_id}.log', environment(sim=sim))
         self.status('entry_check_passed')
 
+    def chain_check(self):
+        """Synthetic scheduler handoff, not model/checkpoint-restoration evidence."""
+        marker = self.stream / 'synthetic_progress.json'
+        predecessor = os.environ.get('V1_PREDECESSOR_JOB_ID')
+        if not predecessor:
+            if marker.exists():
+                raise RuntimeError('Use a fresh V1_RUN for a new --chain-check')
+            write_json(marker, dict(value=1, first_job=self.job_id, code_commit=os.environ.get('V1_CODE_COMMIT')))
+            self.status('chain_probe_saved', synthetic=True)
+            # Deliberately fail the first job to prove afterany, not afterok.
+            raise SystemExit(99)
+        record = json.loads(marker.read_text())
+        if record['first_job'] != predecessor or record['value'] != 1:
+            raise RuntimeError(f'Wrong synthetic predecessor: {record}')
+        if record['code_commit'] != os.environ.get('V1_CODE_COMMIT'):
+            raise RuntimeError('Continuation code version changed')
+        write_json(self.stream / 'synthetic_result.json', dict(record, value=2, continuation_job=self.job_id))
+        self.status('chain_probe_passed', synthetic=True, restored_value=1, final_value=2)
+
 
 def main():
     p = argparse.ArgumentParser()
@@ -173,6 +201,7 @@ def main():
     p.add_argument('--suite', choices=SUITES, required=True)
     modes = p.add_mutually_exclusive_group()
     modes.add_argument('--preflight', action='store_true', help='ER: two tasks, five steps/task, two episodes/cell')
+    modes.add_argument('--chain-check', action='store_true', help='Synthetic scheduler handoff; no training')
     modes.add_argument('--entry-check', action='store_true', help='Short GPU/EGL/port check without training')
     p.add_argument('--tasks', type=int, default=10, choices=range(1, 11))
     a = p.parse_args()
@@ -180,16 +209,24 @@ def main():
     require_slurm()
     install_signal_handlers()
     RUN.mkdir(parents=True, exist_ok=True)
-    mode = 'entry_checks' if a.entry_check else 'preflight' if a.preflight else 'formal'
+    mode = 'chain_checks' if a.chain_check else 'entry_checks' if a.entry_check else 'preflight' if a.preflight else 'formal'
     lane = Lane(a.method, a.suite, mode)
     with stream_lock(lane.stream):
         try:
+            check_predecessor(lane.stream, os.environ.get('V1_PREDECESSOR_JOB_ID'))
             lane.status('starting', method=a.method, suite=a.suite)
+            if a.chain_check:
+                lane.chain_check()
+                return
             if a.entry_check:
                 lane.entry_check()
                 return
-            lane.prepare()
-            for task in range(2 if a.preflight else a.tasks):
+            tasks = 2 if a.preflight else a.tasks
+            steps, episodes = (5, 2) if a.preflight else (10000, 50)
+            actions = [stage_action(lane.stream / f'task{task:02d}', task, steps, episodes) for task in range(tasks)]
+            if 'train' in actions:
+                lane.prepare()
+            for task in range(tasks):
                 lane.stage(lane.root, a.method, a.suite, task, 5 if a.preflight else 10000,
                            2 if a.preflight else 50, preflight=a.preflight)
             lane.status('preflight_passed' if a.preflight else 'completed', tasks=2 if a.preflight else a.tasks)
