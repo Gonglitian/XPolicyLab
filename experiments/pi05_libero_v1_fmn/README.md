@@ -219,3 +219,8 @@ bash experiments/pi05_libero_v1_fmn/submit.sh er libero_spatial --chain-next --c
 
 该模式仅验证真实 Slurm 的 afterany 依赖、顺序启动、同一代码版本和共享进度交接。
 小型 JSON 不是模型 checkpoint，没有训练、Adam 或学习率恢复证据，也不是三天超时实测。
+
+本次实现通过 25 项 CPU 回归测试。实际合成检查已提交为 **989 → 990**，固定源码 commit
+`74bbe0fbb76f051eff883e04d582ab5ee4d34d9d`。在保存本次证据时，989 仍因 Resources 排队，
+990 处于 `afterany:989` 依赖等待，因此尚未声称合成接续运行通过。该状态是检查快照，
+不是实时状态，见 [validation/slurm_chain_989_990.json](validation/slurm_chain_989_990.json)。
