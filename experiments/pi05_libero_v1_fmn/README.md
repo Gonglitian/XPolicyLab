@@ -220,10 +220,14 @@ bash experiments/pi05_libero_v1_fmn/submit.sh er libero_spatial --chain-next --c
 该模式仅验证真实 Slurm 的 afterany 依赖、顺序启动、同一代码版本和共享进度交接。
 小型 JSON 不是模型 checkpoint，没有训练、Adam 或学习率恢复证据，也不是三天超时实测。
 
-本次实现通过 25 项 CPU 回归测试。实际合成检查已提交为 **989 → 990**，固定源码 commit
-`74bbe0fbb76f051eff883e04d582ab5ee4d34d9d`。在保存本次证据时，989 仍因 Resources 排队，
-990 处于 `afterany:989` 依赖等待，因此尚未声称合成接续运行通过。该状态是检查快照，
-不是实时状态，见 [validation/slurm_chain_989_990.json](validation/slurm_chain_989_990.json)。
+合成作业 **989 → 990** 的应用层进度交接已核实：989 写入 value=1 后按设计退出 99，
+990 在其后启动，以同一 commit `74bbe0fbb76f051eff883e04d582ab5ee4d34d9d`
+读取进度并写入 value=2、`chain_probe_passed`，提交记录确认依赖 `afterany:989`。
+989 的退出码有 srun 日志佐证；990 的最终 Slurm 退出码未能补查：scontrol 记录已过期，
+accounting/JobComp 未启用，当前账号无权读取控制器日志。因此仅确认合成进度交接成功，
+不宣称完整调度退出码验收通过，也不代表模型 checkpoint、Adam 或学习率恢复通过。
+原始状态、日志、时间顺序及核查限制见
+[validation/slurm_chain_989_990.json](validation/slurm_chain_989_990.json)。
 
 ## Checkpoint 清理与可训练参数快照
 

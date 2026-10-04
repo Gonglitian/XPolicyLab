@@ -1,7 +1,10 @@
 {
   "scope": "Synthetic Slurm dependency/shared-progress handoff only; not model checkpoint or optimizer recovery",
-  "checked_at": 1791096674.319274,
-  "passed": false,
+  "checked_at": 1791099080.607431,
+  "passed": null,
+  "application_handoff_passed": true,
+  "scheduler_exit_validation_complete": false,
+  "outcome": "Application handoff passed; final scheduler exit code for 990 unavailable",
   "submission": {
     "first_job": "989",
     "continuation_job": "990",
@@ -17,9 +20,77 @@
     "chain_check": true,
     "submitted_at": 1791096605.407096
   },
-  "scheduler": {
-    "989": "JobId=989 JobName=v1_er_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=PENDING Reason=Resources Dependency=(null)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:00:00 TimeLimit=00:02:00 TimeMin=N/A\n   SubmitTime=2026-10-03T23:50:05 EligibleTime=2026-10-03T23:50:05\n   AccrueTime=2026-10-03T23:50:05\n   StartTime=2026-10-04T01:49:48 EndTime=2026-10-04T01:51:48 Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-03T23:51:12 Scheduler=Main\n   Partition=debug AllocNode:Sid=ucrtasl:3308917\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList= SchedNodeList=ucrtasl\n   NumNodes=1-1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=1,mem=2G,node=1,billing=1\n   AllocTRES=(null)\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=1 MinMemoryNode=2G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --parsable --partition=debug --time=00:02:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=1 --mem=2G --job-name=v1_er_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method er --suite libero_spatial --tasks 10 --chain-check\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/slurm/v1_er_libero_spatial-989.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=1\n\n",
-    "990": "JobId=990 JobName=v1_er_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=PENDING Reason=Dependency Dependency=afterany:989(unfulfilled)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:00:00 TimeLimit=00:02:00 TimeMin=N/A\n   SubmitTime=2026-10-03T23:50:05 EligibleTime=Unknown\n   AccrueTime=Unknown\n   StartTime=Unknown EndTime=Unknown Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-03T23:50:05 Scheduler=Main\n   Partition=debug AllocNode:Sid=ucrtasl:3308917\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=\n   NumNodes=1-1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=1,mem=2G,node=1,billing=1\n   AllocTRES=(null)\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=1 MinMemoryNode=2G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --dependency=afterany:989 --parsable --partition=debug --time=00:02:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=1 --mem=2G --job-name=v1_er_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method er --suite libero_spatial --tasks 10 --chain-check\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/slurm/v1_er_libero_spatial-990.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=1\n\n"
+  "records": {
+    "status_job_989.json": {
+      "phase": "interrupted",
+      "timestamp": 1791096770.9165683,
+      "pid": 3346773,
+      "job_id": "989",
+      "cuda_visible_devices": "0",
+      "mode": "chain_checks",
+      "code_commit": "74bbe0fbb76f051eff883e04d582ab5ee4d34d9d",
+      "predecessor_job_id": null,
+      "exit_code": 99
+    },
+    "synthetic_progress.json": {
+      "value": 1,
+      "first_job": "989",
+      "code_commit": "74bbe0fbb76f051eff883e04d582ab5ee4d34d9d"
+    },
+    "status_job_990.json": {
+      "phase": "chain_probe_passed",
+      "timestamp": 1791096773.2049456,
+      "pid": 3347231,
+      "job_id": "990",
+      "cuda_visible_devices": "0",
+      "mode": "chain_checks",
+      "code_commit": "74bbe0fbb76f051eff883e04d582ab5ee4d34d9d",
+      "predecessor_job_id": "989",
+      "synthetic": true,
+      "restored_value": 1,
+      "final_value": 2
+    },
+    "synthetic_result.json": {
+      "value": 2,
+      "first_job": "989",
+      "code_commit": "74bbe0fbb76f051eff883e04d582ab5ee4d34d9d",
+      "continuation_job": "990"
+    }
   },
-  "records": {}
+  "logs": {
+    "v1_er_libero_spatial-990.log": "SLURM_JOB_ID=990 host=ucrtasl code=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn commit=74bbe0fbb76f051eff883e04d582ab5ee4d34d9d predecessor=989\nLANE_STATUS {\"phase\": \"starting\", \"timestamp\": 1791096773.204402, \"pid\": 3347231, \"job_id\": \"990\", \"cuda_visible_devices\": \"0\", \"mode\": \"chain_checks\", \"code_commit\": \"74bbe0fbb76f051eff883e04d582ab5ee4d34d9d\", \"predecessor_job_id\": \"989\", \"method\": \"er\", \"suite\": \"libero_spatial\"}\nLANE_STATUS {\"phase\": \"chain_probe_passed\", \"timestamp\": 1791096773.2049456, \"pid\": 3347231, \"job_id\": \"990\", \"cuda_visible_devices\": \"0\", \"mode\": \"chain_checks\", \"code_commit\": \"74bbe0fbb76f051eff883e04d582ab5ee4d34d9d\", \"predecessor_job_id\": \"989\", \"synthetic\": true, \"restored_value\": 1, \"final_value\": 2}\n",
+    "v1_er_libero_spatial-989.log": "SLURM_JOB_ID=989 host=ucrtasl code=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn commit=74bbe0fbb76f051eff883e04d582ab5ee4d34d9d predecessor=none\nLANE_STATUS {\"phase\": \"starting\", \"timestamp\": 1791096770.9158278, \"pid\": 3346773, \"job_id\": \"989\", \"cuda_visible_devices\": \"0\", \"mode\": \"chain_checks\", \"code_commit\": \"74bbe0fbb76f051eff883e04d582ab5ee4d34d9d\", \"predecessor_job_id\": null, \"method\": \"er\", \"suite\": \"libero_spatial\"}\nLANE_STATUS {\"phase\": \"chain_probe_saved\", \"timestamp\": 1791096770.9163048, \"pid\": 3346773, \"job_id\": \"989\", \"cuda_visible_devices\": \"0\", \"mode\": \"chain_checks\", \"code_commit\": \"74bbe0fbb76f051eff883e04d582ab5ee4d34d9d\", \"predecessor_job_id\": null, \"synthetic\": true}\nLANE_STATUS {\"phase\": \"interrupted\", \"timestamp\": 1791096770.9165683, \"pid\": 3346773, \"job_id\": \"989\", \"cuda_visible_devices\": \"0\", \"mode\": \"chain_checks\", \"code_commit\": \"74bbe0fbb76f051eff883e04d582ab5ee4d34d9d\", \"predecessor_job_id\": null, \"exit_code\": 99}\nsrun: error: ucrtasl: task 0: Exited with exit code 99\nsrun: Terminating StepId=989.0\n"
+  },
+  "checks": {
+    "first_exit_99": true,
+    "afterany_dependency": true,
+    "ordered_execution": true,
+    "same_commit": true,
+    "restored_value": 1,
+    "final_value": 2
+  },
+  "scheduler_final": {
+    "job989_exit_code": 99,
+    "job989_exit_source": "srun log and application status",
+    "job990_exit_code": null,
+    "reason": "scontrol records expired; accounting and JobComp disabled; /var/log/slurm/slurmctld.log not readable by this account"
+  },
+  "scheduler_before_execution": {
+    "checked_at": 1791096674.319274,
+    "records": {
+      "989": "JobId=989 JobName=v1_er_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=PENDING Reason=Resources Dependency=(null)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:00:00 TimeLimit=00:02:00 TimeMin=N/A\n   SubmitTime=2026-10-03T23:50:05 EligibleTime=2026-10-03T23:50:05\n   AccrueTime=2026-10-03T23:50:05\n   StartTime=2026-10-04T01:49:48 EndTime=2026-10-04T01:51:48 Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-03T23:51:12 Scheduler=Main\n   Partition=debug AllocNode:Sid=ucrtasl:3308917\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList= SchedNodeList=ucrtasl\n   NumNodes=1-1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=1,mem=2G,node=1,billing=1\n   AllocTRES=(null)\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=1 MinMemoryNode=2G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --parsable --partition=debug --time=00:02:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=1 --mem=2G --job-name=v1_er_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method er --suite libero_spatial --tasks 10 --chain-check\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/slurm/v1_er_libero_spatial-989.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=1\n\n",
+      "990": "JobId=990 JobName=v1_er_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=PENDING Reason=Dependency Dependency=afterany:989(unfulfilled)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:00:00 TimeLimit=00:02:00 TimeMin=N/A\n   SubmitTime=2026-10-03T23:50:05 EligibleTime=Unknown\n   AccrueTime=Unknown\n   StartTime=Unknown EndTime=Unknown Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-03T23:50:05 Scheduler=Main\n   Partition=debug AllocNode:Sid=ucrtasl:3308917\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=\n   NumNodes=1-1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=1,mem=2G,node=1,billing=1\n   AllocTRES=(null)\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=1 MinMemoryNode=2G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --dependency=afterany:989 --parsable --partition=debug --time=00:02:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=1 --mem=2G --job-name=v1_er_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method er --suite libero_spatial --tasks 10 --chain-check\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/code_snapshots/74bbe0fbb76f051eff883e04d582ab5ee4d34d9d/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_chain_check_1791096604/slurm/v1_er_libero_spatial-990.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=1\n\n"
+    }
+  },
+  "model_checkpoint_recovery_verified": false,
+  "optimizer_recovery_verified": false,
+  "learning_rate_recovery_verified": false,
+  "source_sha256": {
+    "chain_checks/er/libero_spatial/status_job_989.json": "86ac30fd4ee786cb283895cf69c5eca08eb261521f45830a92eddb70c20c52ad",
+    "chain_checks/er/libero_spatial/synthetic_progress.json": "eae3af9437337b720845ef925e17b8b0bfc3dcd50ee7c8ce03b0b445c5b54ce3",
+    "chain_checks/er/libero_spatial/status_job_990.json": "0d3551e3118f914edaf35ea10ab85e3283532575df07c94fb521d9c20c69504d",
+    "chain_checks/er/libero_spatial/synthetic_result.json": "fb41782f907b0744d3a41307a0a8d8eeb002511c25a0d0816cfd07863280f6c1",
+    "slurm/v1_er_libero_spatial-990.log": "6da2b2204e76724f8ff7e11b6bb60d35708983ad2efa5223117469c60073dab5",
+    "slurm/v1_er_libero_spatial-989.log": "aa0a74128056814d2b03b3f7cf7925729c93f57befb31c236677d5b0bdfbfb61"
+  }
 }
