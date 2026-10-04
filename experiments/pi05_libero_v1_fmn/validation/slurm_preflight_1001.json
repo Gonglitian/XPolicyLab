@@ -1,0 +1,268 @@
+{
+  "scope": "Real ER two-task preflight, not full training quality or mid-task cancellation recovery",
+  "job_id": "1001",
+  "passed": true,
+  "checked_at": 1791099529.9592938,
+  "commit": "05721d3bc66055572de264dec7f8a76c4fc46d25",
+  "configs": [
+    {
+      "method": "er",
+      "suite": "libero_spatial",
+      "task": 0,
+      "seed": 42,
+      "steps_per_task": 5,
+      "begin_step": 0,
+      "end_step": 5,
+      "start_step": 0,
+      "init_source": "pi05_base",
+      "optimizer_moment_norm_at_start": 0.0,
+      "current_batch": 8,
+      "replay_batch": 0,
+      "replay_samples_per_old_task": 1000,
+      "devices": [
+        "cuda:0"
+      ],
+      "fsdp_devices": 1,
+      "model": "Pi0Config(action_dim=32, action_horizon=10, max_token_len=200, dtype='bfloat16', paligemma_variant='gemma_2b_lora', action_expert_variant='gemma_300m_lora', pi05=True, discrete_state_input=False)",
+      "optimizer": "AdamW(b1=0.9, b2=0.95, eps=1e-08, weight_decay=1e-10, clip_gradient_norm=1.0)",
+      "lr_schedule": "CosineDecaySchedule(warmup_steps=1000, peak_lr=2.5e-05, decay_steps=30000, decay_lr=2.5e-06)",
+      "lr_at_begin": 2.497472451068461e-08,
+      "lr_at_end": 1.498501660535112e-07,
+      "lr_at_start": 2.497472451068461e-08,
+      "resume_checkpoint": null,
+      "job_id": "1001",
+      "code_commit": "05721d3bc66055572de264dec7f8a76c4fc46d25",
+      "normalization": "suite-level mean/std, computed once over all 10 tasks (FMN-style)",
+      "data": "physical-intelligence/libero 256px no-noops, no extra flip",
+      "trainable_parameters": 466957072,
+      "frozen_parameters": 2936464384,
+      "trainable_groups": [
+        "PaliGemma/img",
+        "PaliGemma/llm",
+        "action_in_proj/bias",
+        "action_in_proj/kernel",
+        "action_out_proj/bias",
+        "action_out_proj/kernel",
+        "time_mlp_in/bias",
+        "time_mlp_in/kernel",
+        "time_mlp_out/bias",
+        "time_mlp_out/kernel"
+      ],
+      "preflight": true,
+      "save_trainable_snapshots": true
+    },
+    {
+      "method": "er",
+      "suite": "libero_spatial",
+      "task": 1,
+      "seed": 42,
+      "steps_per_task": 5,
+      "begin_step": 5,
+      "end_step": 10,
+      "start_step": 5,
+      "init_source": "carry_from_previous_task",
+      "optimizer_moment_norm_at_start": 0.13622810071570227,
+      "current_batch": 8,
+      "replay_batch": 8,
+      "replay_samples_per_old_task": 1000,
+      "devices": [
+        "cuda:0"
+      ],
+      "fsdp_devices": 1,
+      "model": "Pi0Config(action_dim=32, action_horizon=10, max_token_len=200, dtype='bfloat16', paligemma_variant='gemma_2b_lora', action_expert_variant='gemma_300m_lora', pi05=True, discrete_state_input=False)",
+      "optimizer": "AdamW(b1=0.9, b2=0.95, eps=1e-08, weight_decay=1e-10, clip_gradient_norm=1.0)",
+      "lr_schedule": "CosineDecaySchedule(warmup_steps=1000, peak_lr=2.5e-05, decay_steps=30000, decay_lr=2.5e-06)",
+      "lr_at_begin": 1.498501660535112e-07,
+      "lr_at_end": 2.747256075963378e-07,
+      "lr_at_start": 1.498501660535112e-07,
+      "resume_checkpoint": "task00/checkpoints/pi05_libero_cl/stage/5",
+      "job_id": "1001",
+      "code_commit": "05721d3bc66055572de264dec7f8a76c4fc46d25",
+      "normalization": "suite-level mean/std, computed once over all 10 tasks (FMN-style)",
+      "data": "physical-intelligence/libero 256px no-noops, no extra flip",
+      "trainable_parameters": 466957072,
+      "frozen_parameters": 2936464384,
+      "trainable_groups": [
+        "PaliGemma/img",
+        "PaliGemma/llm",
+        "action_in_proj/bias",
+        "action_in_proj/kernel",
+        "action_out_proj/bias",
+        "action_out_proj/kernel",
+        "time_mlp_in/bias",
+        "time_mlp_in/kernel",
+        "time_mlp_out/bias",
+        "time_mlp_out/kernel"
+      ],
+      "preflight": true,
+      "save_trainable_snapshots": true
+    }
+  ],
+  "trained": [
+    {
+      "checkpoint": "task00/checkpoints/pi05_libero_cl/stage/5",
+      "checkpoint_path_base": "stream",
+      "checkpoint_complete": true,
+      "begin_step": 0,
+      "end_step": 5,
+      "seconds": 157.65913034102414,
+      "finished_at": 1791099021.240222,
+      "preflight": true
+    },
+    {
+      "checkpoint": "task01/checkpoints/pi05_libero_cl/stage/10",
+      "checkpoint_path_base": "stream",
+      "checkpoint_complete": true,
+      "begin_step": 5,
+      "end_step": 10,
+      "seconds": 204.93690654999227,
+      "finished_at": 1791099323.1910748,
+      "preflight": true
+    }
+  ],
+  "evaluated": [
+    {
+      "row": {
+        "0": 0.0
+      },
+      "episodes": 2,
+      "total_episodes": 2,
+      "finished_at": 1791099095.610681,
+      "job_id": "1001"
+    },
+    {
+      "row": {
+        "0": 0.0,
+        "1": 0.0
+      },
+      "episodes": 2,
+      "total_episodes": 4,
+      "finished_at": 1791099377.3617344,
+      "job_id": "1001"
+    }
+  ],
+  "episode_records": [
+    [
+      {
+        "task": 0,
+        "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+        "episode": 0,
+        "seed": 42,
+        "success": false,
+        "steps": 220,
+        "seconds": 43.39501300500706,
+        "horizon": 220,
+        "wait_steps": 10,
+        "timestamp": 1791099092.7508876
+      },
+      {
+        "task": 0,
+        "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+        "episode": 1,
+        "seed": 43,
+        "success": false,
+        "steps": 220,
+        "seconds": 44.94234786601737,
+        "horizon": 220,
+        "wait_steps": 10,
+        "timestamp": 1791099094.1837459
+      }
+    ],
+    [
+      {
+        "task": 0,
+        "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+        "episode": 0,
+        "seed": 42,
+        "success": false,
+        "steps": 220,
+        "seconds": 12.79295584600186,
+        "horizon": 220,
+        "wait_steps": 10,
+        "timestamp": 1791099365.5690105
+      },
+      {
+        "task": 1,
+        "task_name": "pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate",
+        "episode": 0,
+        "seed": 1042,
+        "success": false,
+        "steps": 220,
+        "seconds": 9.020004922000226,
+        "horizon": 220,
+        "wait_steps": 10,
+        "timestamp": 1791099375.796219
+      },
+      {
+        "task": 0,
+        "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+        "episode": 1,
+        "seed": 43,
+        "success": false,
+        "steps": 220,
+        "seconds": 13.54476269998122,
+        "horizon": 220,
+        "wait_steps": 10,
+        "timestamp": 1791099366.227014
+      },
+      {
+        "task": 1,
+        "task_name": "pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate",
+        "episode": 1,
+        "seed": 1043,
+        "success": false,
+        "steps": 220,
+        "seconds": 9.089131880988134,
+        "horizon": 220,
+        "wait_steps": 10,
+        "timestamp": 1791099376.5277712
+      }
+    ]
+  ],
+  "snapshots": [
+    {
+      "format": "v1-trainable-orbax-1",
+      "task": 0,
+      "step": 5,
+      "parameter_count": 466957072,
+      "parameter_bytes": 1867828288,
+      "schema_sha256": "9e4a877ecc1e69c4f94d23d8fb806a8d44cec4ca89019577039ecafe404ef87e"
+    },
+    {
+      "format": "v1-trainable-orbax-1",
+      "task": 1,
+      "step": 10,
+      "parameter_count": 466957072,
+      "parameter_bytes": 1867828288,
+      "schema_sha256": "9e4a877ecc1e69c4f94d23d8fb806a8d44cec4ca89019577039ecafe404ef87e"
+    }
+  ],
+  "scheduler": "JobId=1001 JobName=v1_er_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=COMPLETED Reason=None Dependency=(null)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:10:06 TimeLimit=3-00:00:00 TimeMin=N/A\n   SubmitTime=2026-10-04T00:26:13 EligibleTime=2026-10-04T00:26:13\n   AccrueTime=2026-10-04T00:26:13\n   StartTime=2026-10-04T00:26:13 EndTime=2026-10-04T00:36:19 Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-04T00:26:13 Scheduler=Backfill\n   Partition=gpu AllocNode:Sid=ucrtasl:3554228\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=ucrtasl\n   BatchHost=ucrtasl\n   NumNodes=1 NumCPUs=12 NumTasks=1 CPUs/Task=12 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=12,mem=60G,node=1,billing=12\n   AllocTRES=cpu=12,mem=60G,node=1,billing=12\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=12 MinMemoryNode=60G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/05721d3bc66055572de264dec7f8a76c4fc46d25/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --parsable --partition=gpu --time=3-00:00:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=12 --mem=60G --job-name=v1_er_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/05721d3bc66055572de264dec7f8a76c4fc46d25/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/05721d3bc66055572de264dec7f8a76c4fc46d25/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method er --suite libero_spatial --tasks 10 --preflight --save-trainable-snapshots\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/05721d3bc66055572de264dec7f8a76c4fc46d25/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/v1_er_libero_spatial-1001.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=12\n\n",
+  "disk_sample": {
+    "scope": "stream only; excludes shared caches, data, base weights and code",
+    "measurement": "allocated bytes sampled at save/cleanup boundaries; not continuous peak",
+    "sampled_peak_bytes": 22562861056,
+    "current_bytes": 13018472448,
+    "event": "after_evaluation_cleanup",
+    "timestamp": 1791099379.3922565
+  },
+  "retention_audit": [
+    {
+      "event": "delete_started",
+      "timestamp": 1791099330.8573992,
+      "job_id": "1001",
+      "path": "task00/checkpoints/pi05_libero_cl/stage/5",
+      "reason": "task01 final checkpoint confirmed",
+      "allocated_bytes": 9544466432
+    },
+    {
+      "event": "delete_completed",
+      "timestamp": 1791099332.3157103,
+      "job_id": "1001",
+      "path": "task00/checkpoints/pi05_libero_cl/stage/5",
+      "reason": "task01 final checkpoint confirmed",
+      "allocated_bytes": 9544466432
+    }
+  ],
+  "run": "/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004"
+}

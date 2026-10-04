@@ -13,7 +13,7 @@
 同一个 Slurm step/cgroup 中。程序继承 Slurm 的 CUDA_VISIBLE_DEVICES，不接受物理 GPU 编号。
 GPU 空闲与排队由 Slurm 负责；已移除 wait_idle、GPU guard 和退出码 75 的等待重试。
 
-完整两任务训练冒烟、1 万步/50 次单任务评测、scancel 训练恢复仍属于后续验收。checkpoint 清理与可训练参数快照已实现并通过 CPU 检查，完整模型 Slurm 验证仍待完成。当前入口检查不等同于这些验收。
+ER 两任务训练冒烟已通过（作业 1001）；1 万步/50 次单任务评测、scancel 训练恢复及双流并行仍待验收。checkpoint 清理与可训练参数快照已实现并通过 CPU 检查，完整模型 Slurm 验证仍待完成。当前入口检查不等同于这些验收。
 
 ## Slurm 提交（labserver）
 
@@ -310,3 +310,23 @@ labserver 在创建目录之前校验 V1_RUN 与所有配置缓存目录的真�
 
 这些检查没有运行完整 pi0.5 训练，不替代 Slurm 冒烟、真实 Adam/LR 中断续跑、
 成功率、并行实验、BCC 实机或磁盘峰值验收。
+
+
+## 实际 ER 两任务冒烟：作业 1001
+
+固定代码 commit 为 05721d3bc66055572de264dec7f8a76c4fc46d25。
+gpu 分区，1 GPU / 12 CPU / 60G；Slurm 已确认 COMPLETED、ExitCode=0:0，耗时 10 分 6 秒。
+任务 0 全局步数 0→5，任务 1 为 5→10；任务 1 起始 Adam 动量范数
+0.13622810071570227，衔接学习率 1.498501660535112e-7。
+任务 0 batch 为当前 8，任务 1 为当前 8 + 回放 8。
+两阶段分别完成 2 和 4 次评测，三格成功率均为 0；5 步冒烟仅证明流程，
+不作为完整训练成功率结论。
+
+开启快照后保留两份各含 466,957,072 个参数的快照，参数载荷每份 1,867,828,288 字节
+（不含文件格式开销）。task00 完整 checkpoint 已按规则删除，task01 最终 checkpoint 保留。
+这不是十任务峰值实测。原始配置、逐 episode 结果、清理记录和 Slurm 最终状态见
+[validation/slurm_preflight_1001.json](validation/slurm_preflight_1001.json)。
+
+从后续提交起，batch 脚本另写入 $V1_RUN/slurm/exit_JOB_ID.json，保留 srun 返回后的
+batch 退出码。SIGKILL/节点故障可能阻止落盘，缺文件不能当作退出 0；
+此记录与调度器最终状态分开报告，及时留存 scontrol 输出仍有必要。
