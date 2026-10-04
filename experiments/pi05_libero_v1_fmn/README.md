@@ -330,3 +330,15 @@ gpu 分区，1 GPU / 12 CPU / 60G；Slurm 已确认 COMPLETED、ExitCode=0:0，�
 从后续提交起，batch 脚本另写入 $V1_RUN/slurm/exit_JOB_ID.json，保留 srun 返回后的
 batch 退出码。SIGKILL/节点故障可能阻止落盘，缺文件不能当作退出 0；
 此记录与调度器最终状态分开报告，及时留存 scontrol 输出仍有必要。
+
+## 实际任务内中断恢复：1021 → 1131
+
+SeqFT Spatial task00 的作业 1021 在 checkpoint 5000 完整提交后执行 scancel，
+取消前日志记录到 5100 步；Slurm 留存为 CANCELLED / ExitCode=143:0，batch 退出记录也为 143。
+同一 commit 036a60a9d71c5f8da6697304185d4a90e3f4179a、配置及流目录重提为 1131。
+1131 已从 checkpoint 5000 恢复，起始 Adam 动量范数 0.10483583735883913，
+起始学习率 2.3960221369634382e-5，与中断前第 5000 步记录一致；未重新 warmup。
+本次检查时恢复后已继续训练到至少 7050 步。
+这确认了任务内恢复起点和后续训练，但 10000 步/50 次评测、最终退出状态、
+已完成任务跳过及双流并行仍待验收，不能据此标记全部通过。
+证据见 [validation/slurm_resume_1021_1131.json](validation/slurm_resume_1021_1131.json)。

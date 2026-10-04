@@ -1,0 +1,159 @@
+{
+  "scope": "Real mid-task scancel and checkpoint restoration; full-task evaluation still pending",
+  "checked_at": 1791116240.58772,
+  "initial_job": "1021",
+  "resumed_job": "1131",
+  "restoration_checks_passed": true,
+  "full_task_validation_passed": null,
+  "skip_completed_tasks_verified": false,
+  "cancellation": {
+    "initial_job": "1021",
+    "requested_at": 1791107297.47976,
+    "progress_before_cancel": {
+      "step": 5100,
+      "task_step": 5100,
+      "loss": 0.052994741834700106,
+      "grad_norm": 0.4142131179571152,
+      "lr": 2.3908452931209467e-05,
+      "seconds_per_step": 1.3837326093000593,
+      "elapsed_seconds": 7341.503209119983,
+      "gpu_mib_in_use": 11176,
+      "gpu_mib_peak": 19100,
+      "timestamp": 1791107262.5243394,
+      "method": "sf",
+      "suite": "libero_spatial",
+      "task": 0,
+      "job_id": "1021"
+    },
+    "checkpoint": "sf/libero_spatial/task00/checkpoints/pi05_libero_cl/stage/5000",
+    "checkpoint_metadata": {
+      "item_handlers": {
+        "assets": "openpi.training.checkpoints.CallbackHandler",
+        "params": "orbax.checkpoint._src.handlers.pytree_checkpoint_handler.PyTreeCheckpointHandler",
+        "train_state": "orbax.checkpoint._src.handlers.pytree_checkpoint_handler.PyTreeCheckpointHandler"
+      },
+      "metrics": {},
+      "performance_metrics": {},
+      "init_timestamp_nsecs": 1791107074251121264,
+      "commit_timestamp_nsecs": 1791107126345124405,
+      "custom_metadata": {}
+    },
+    "metrics_at_checkpoint": {
+      "step": 5000,
+      "task_step": 5000,
+      "loss": 0.05902175895869732,
+      "grad_norm": 0.4720560026168823,
+      "lr": 2.3960221369634382e-05,
+      "seconds_per_step": 1.3999522246600826,
+      "elapsed_seconds": 7153.210628317,
+      "gpu_mib_in_use": 11176,
+      "gpu_mib_peak": 19100,
+      "timestamp": 1791107074.2329414,
+      "method": "sf",
+      "suite": "libero_spatial",
+      "task": 0,
+      "job_id": "1021"
+    },
+    "original_run_config": {
+      "method": "sf",
+      "suite": "libero_spatial",
+      "task": 0,
+      "seed": 42,
+      "steps_per_task": 10000,
+      "begin_step": 0,
+      "end_step": 10000,
+      "start_step": 0,
+      "init_source": "pi05_base",
+      "optimizer_moment_norm_at_start": 0.0,
+      "current_batch": 8,
+      "replay_batch": 0,
+      "replay_samples_per_old_task": 1000,
+      "devices": [
+        "cuda:0"
+      ],
+      "fsdp_devices": 1,
+      "model": "Pi0Config(action_dim=32, action_horizon=10, max_token_len=200, dtype='bfloat16', paligemma_variant='gemma_2b_lora', action_expert_variant='gemma_300m_lora', pi05=True, discrete_state_input=False)",
+      "optimizer": "AdamW(b1=0.9, b2=0.95, eps=1e-08, weight_decay=1e-10, clip_gradient_norm=1.0)",
+      "lr_schedule": "CosineDecaySchedule(warmup_steps=1000, peak_lr=2.5e-05, decay_steps=30000, decay_lr=2.5e-06)",
+      "lr_at_begin": 2.497472451068461e-08,
+      "lr_at_end": 2.0063353076693602e-05,
+      "lr_at_start": 2.497472451068461e-08,
+      "resume_checkpoint": null,
+      "job_id": "1021",
+      "code_commit": "036a60a9d71c5f8da6697304185d4a90e3f4179a",
+      "normalization": "suite-level mean/std, computed once over all 10 tasks (FMN-style)",
+      "data": "physical-intelligence/libero 256px no-noops, no extra flip",
+      "trainable_parameters": 466957072,
+      "frozen_parameters": 2936464384,
+      "trainable_groups": [
+        "PaliGemma/img",
+        "PaliGemma/llm",
+        "action_in_proj/bias",
+        "action_in_proj/kernel",
+        "action_out_proj/bias",
+        "action_out_proj/kernel",
+        "time_mlp_in/bias",
+        "time_mlp_in/kernel",
+        "time_mlp_out/bias",
+        "time_mlp_out/kernel"
+      ],
+      "preflight": false,
+      "save_trainable_snapshots": false
+    },
+    "scheduler_before_cancel": "JobId=1021 JobName=v1_sf_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=RUNNING Reason=None Dependency=(null)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=02:03:48 TimeLimit=3-00:00:00 TimeMin=N/A\n   SubmitTime=2026-10-04T00:44:29 EligibleTime=2026-10-04T00:44:29\n   AccrueTime=2026-10-04T00:44:29\n   StartTime=2026-10-04T00:44:29 EndTime=2026-10-07T00:44:29 Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-04T00:44:29 Scheduler=Main\n   Partition=gpu AllocNode:Sid=ucrtasl:3609163\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=ucrtasl\n   BatchHost=ucrtasl\n   NumNodes=1 NumCPUs=12 NumTasks=1 CPUs/Task=12 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=12,mem=60G,node=1,billing=12\n   AllocTRES=cpu=12,mem=60G,node=1,billing=12\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=12 MinMemoryNode=60G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --parsable --partition=gpu --time=3-00:00:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=12 --mem=60G --job-name=v1_sf_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method sf --suite libero_spatial --tasks 1\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/v1_sf_libero_spatial-1021.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=12\n\n",
+    "scancel_result": {
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "initial_scheduler_final": "JobId=1021 JobName=v1_sf_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=CANCELLED Reason=None Dependency=(null)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=143:0\n   RunTime=02:03:48 TimeLimit=3-00:00:00 TimeMin=N/A\n   SubmitTime=2026-10-04T00:44:29 EligibleTime=2026-10-04T00:44:29\n   AccrueTime=2026-10-04T00:44:29\n   StartTime=2026-10-04T00:44:29 EndTime=2026-10-04T02:48:17 Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-04T00:44:29 Scheduler=Main\n   Partition=gpu AllocNode:Sid=ucrtasl:3609163\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=ucrtasl\n   BatchHost=ucrtasl\n   NumNodes=1 NumCPUs=12 NumTasks=1 CPUs/Task=12 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=12,mem=60G,node=1,billing=12\n   AllocTRES=cpu=12,mem=60G,node=1,billing=12\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=12 MinMemoryNode=60G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --parsable --partition=gpu --time=3-00:00:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=12 --mem=60G --job-name=v1_sf_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method sf --suite libero_spatial --tasks 1\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/v1_sf_libero_spatial-1021.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=12\n\n",
+  "initial_batch_exit": {
+    "job_id": "1021",
+    "batch_exit_code": 143,
+    "code_commit": "036a60a9d71c5f8da6697304185d4a90e3f4179a",
+    "timestamp": 1791107300.1816783,
+    "source": "batch EXIT trap after srun; not scheduler terminal state"
+  },
+  "resume_history": [
+    {
+      "job_id": "1021",
+      "code_commit": "036a60a9d71c5f8da6697304185d4a90e3f4179a",
+      "timestamp": 1791099920.6841583,
+      "source": "pi05_base",
+      "checkpoint": null,
+      "start_step": 0,
+      "task_step": 0,
+      "lr_at_start": 2.497472451068461e-08,
+      "optimizer_moment_norm": 0.0
+    },
+    {
+      "job_id": "1131",
+      "code_commit": "036a60a9d71c5f8da6697304185d4a90e3f4179a",
+      "timestamp": 1791113171.9358058,
+      "source": "resume_same_task",
+      "checkpoint": "task00/checkpoints/pi05_libero_cl/stage/5000",
+      "start_step": 5000,
+      "task_step": 5000,
+      "lr_at_start": 2.3960221369634382e-05,
+      "optimizer_moment_norm": 0.10483583735883913
+    }
+  ],
+  "progress_at_check": {
+    "step": 7050,
+    "task_step": 7050,
+    "loss": 0.043239143677055836,
+    "grad_norm": 0.3769493067264557,
+    "lr": 2.2669037207379006e-05,
+    "seconds_per_step": 1.8335365829797228,
+    "elapsed_seconds": 2928.3299305999826,
+    "gpu_mib_in_use": 11203,
+    "gpu_mib_peak": 19126,
+    "timestamp": 1791116187.2916827,
+    "method": "sf",
+    "suite": "libero_spatial",
+    "task": 0,
+    "job_id": "1131"
+  },
+  "resumed_scheduler_at_check": "JobId=1131 JobName=v1_sf_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=RUNNING Reason=None Dependency=(null)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:50:44 TimeLimit=3-00:00:00 TimeMin=N/A\n   SubmitTime=2026-10-04T02:49:25 EligibleTime=2026-10-04T02:49:25\n   AccrueTime=2026-10-04T02:49:25\n   StartTime=2026-10-04T04:25:45 EndTime=2026-10-07T04:25:45 Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-04T04:25:45 Scheduler=Main\n   Partition=gpu AllocNode:Sid=ucrtasl:3881683\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=ucrtasl\n   BatchHost=ucrtasl\n   NumNodes=1 NumCPUs=12 NumTasks=1 CPUs/Task=12 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=12,mem=60G,node=1,billing=12\n   AllocTRES=cpu=12,mem=60G,node=1,billing=12\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=12 MinMemoryNode=60G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --parsable --partition=gpu --time=3-00:00:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=12 --mem=60G --job-name=v1_sf_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method sf --suite libero_spatial --tasks 1\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/v1_sf_libero_spatial-1131.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=12\n\n"
+}
