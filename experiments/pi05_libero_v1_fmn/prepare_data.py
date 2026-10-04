@@ -4,6 +4,7 @@ import json, os, sys
 import numpy as np
 from pathlib import Path
 from common import DATA, RUN, SUITES, write_json, _fixed
+from paths import relative_path
 
 def norm_text(s):
     return ' '.join(str(s).lower().replace('.', ' ').split())
@@ -40,7 +41,7 @@ for suite in SUITES:
             assert set(t.column('task_index').to_numpy().tolist()) == {tidx}, f
             all_state.append(_fixed(t.column('state'), 8)); all_action.append(_fixed(t.column('actions'), 7))
             frames += t.num_rows
-        entries.append(dict(b, task_index=tidx, episode_files=files, episodes=len(files), frames=frames))
+        entries.append(dict(b, task_index=tidx, episode_files=[relative_path(f, DATA) for f in files], episode_path_base='V1_DATA', episodes=len(files), frames=frames))
     assert len({e['task_index'] for e in entries}) == 10
     manifest[suite] = entries
     if not all_state:

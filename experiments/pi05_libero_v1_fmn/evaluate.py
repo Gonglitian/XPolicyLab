@@ -5,7 +5,7 @@ import json
 import time
 import numpy as np
 from pathlib import Path
-from common import RUN, HORIZONS, write_json
+from common import RUN, HORIZONS, write_json, load_manifest
 from XPolicyLab.benchmarks.libero.client import make_env, run_episode
 from client_server.ws import WsModelClient
 from libero.libero import benchmark
@@ -21,7 +21,7 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     a = p.parse_args()
     suite = benchmark.get_benchmark_dict()[a.suite](task_order_index=0)
-    manifest = json.loads((RUN / 'manifest.json').read_text())[a.suite]
+    manifest = load_manifest(a.output.parent.parent.parent)[a.suite]
     prior = json.loads(a.output.read_text()) if a.output.exists() else {'episodes': []}
     records = prior['episodes']
     done_keys = {(r['task'], r['episode']) for r in records}

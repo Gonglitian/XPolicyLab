@@ -3,9 +3,14 @@ A lane waits >=60 s for an idle GPU before starting the next stage, so a 15 s po
 Kills only the recorded PID's process group, after checking its command line."""
 import json, os, signal, time
 from pathlib import Path
-R = Path('/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_fmn')
-LANES = {1: ('er', 'libero_spatial', 3205872), 2: ('sf', 'libero_spatial', 3265967),
-         3: ('er', 'libero_object', 3265969), 4: ('sf', 'libero_object', 3265971)}
+from paths import RUN as R
+# Explicit input prevents reuse of the historical migration process IDs.
+import argparse
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--lanes-json', type=Path, required=True,
+                    help='Mapping GPU index to [method, suite, PID]; legacy multi-lane helper only')
+args = parser.parse_args()
+LANES = {int(gpu): tuple(spec) for gpu, spec in json.loads(args.lanes_json.read_text()).items()}
 log = lambda m: print(time.strftime('[%F %T] ') + m, flush=True)
 pending = dict(LANES)
 log(f'watching {pending}')

@@ -12,9 +12,14 @@ from pathlib import Path
 from common import ROOT, ASSETS, RUN, SUITES, write_json
 from gpu_guard import snapshot, Guard
 
-CODE = Path(__file__).resolve().parent
-PI_PY = ROOT / 'XPolicyLab-envs/pi05-robocasa/bin/python'
-SIM_PY = ASSETS / 'envs/xvla-sanity/bin/python'
+from paths import CODE, REPO, OPENPI, configured_path, resolve_checkpoint
+import shutil
+PI_PY = configured_path('V1_PI_PY')
+SIM_PY = configured_path('V1_SIM_PY')
+PI_PATHS = os.environ.get('V1_PI_PATHS', str(OPENPI / 'src'))
+SIM_PATHS = os.environ['V1_SIM_PATHS']
+LIBERO_CONFIG = configured_path('V1_LIBERO_CONFIG')
+WS_PATHS = os.environ.get('V1_WS_PATHS', '')
 # One policy server per client: the served Model keeps a single observation window, so clients must not share it.
 SERVERS = WORKERS = 4
 
@@ -25,18 +30,22 @@ def environment(gpu, sim=False):
         CUDA_DEVICE_ORDER='PCI_BUS_ID', CUDA_VISIBLE_DEVICES=gpu,
         XLA_PYTHON_CLIENT_PREALLOCATE='false', XLA_PYTHON_CLIENT_MEM_FRACTION='0.92',
         MUJOCO_GL='egl', PYOPENGL_PLATFORM='egl', TOKENIZERS_PARALLELISM='false',
-        TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD='1', IMAGEIO_FFMPEG_EXE='/usr/bin/ffmpeg',
-        LIBERO_CONFIG_PATH=str(ASSETS / 'sanity_checks/20260922/xvla_libero/libero_config'),
-        JAX_COMPILATION_CACHE_DIR=str(RUN / 'jax_cache'), PYTHONHASHSEED='42')
-    paths = [str(CODE), str(ASSETS / 'envs/xvla-ws-deps'), str(ROOT), str(ROOT / 'XPolicyLab')]
+        TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD='1',
+        LIBERO_CONFIG_PATH=str(LIBERO_CONFIG),
+        JAX_COMPILATION_CACHE_DIR=str(configured_path('V1_JAX_CACHE')), PYTHONHASHSEED='42')
+    ffmpeg = os.environ.get('V1_FFMPEG') or shutil.which('ffmpeg')
+    if ffmpeg:
+        env['IMAGEIO_FFMPEG_EXE'] = ffmpeg
+    paths = (SIM_PATHS if sim else PI_PATHS).split(os.pathsep)
+    paths += [str(CODE), *WS_PATHS.split(os.pathsep), str(REPO.parent), str(REPO)]
     if sim:
-        paths.insert(0, '/home/vla-reasoning/proj/autofocus_3d/baselines/libero')
         env['MUJOCO_EGL_DEVICE_ID'] = gpu
-    else:
-        paths.insert(0, str(ROOT / 'XPolicyLab-upstreams/openpi-robocasa/src'))
-        paths.extend(['/data1/vla-reasoning/proj/EvoMoE/eval/robocasa/deps/robocasa',
-                      '/data1/vla-reasoning/proj/EvoMoE/eval/robocasa/deps/robosuite'])
-    env['PYTHONPATH'] = ':'.join(paths)
+    env['PYTHONPATH'] = os.pathsep.join(dict.fromkeys(p for p in paths if p))
+    for key in ('TMPDIR', 'HF_HOME', 'HF_HUB_CACHE', 'HF_DATASETS_CACHE',
+                'TRANSFORMERS_CACHE', 'OPENPI_DATA_HOME', 'XDG_CACHE_HOME', 'TORCH_HOME',
+                'TRITON_CACHE_DIR', 'CUDA_CACHE_PATH', 'JAX_COMPILATION_CACHE_DIR'):
+        if env.get(key):
+            Path(env[key]).mkdir(parents=True, exist_ok=True)
     return env
 
 class Lane:
@@ -156,10 +165,11 @@ class Lane:
         if (stage / 'evaluated.json').exists():
             row = json.loads((stage / 'evaluated.json').read_text())['row']
         else:
+            checkpoint = str(resolve_checkpoint(stage.parent, trained['checkpoint'], task))
             for attempt in range(3):
                 self.status('evaluation', method=method, suite=suite, task=task, checkpoint=trained['checkpoint'], attempt=attempt)
                 try:
-                    row = self.evaluate(stage, suite, task, trained['checkpoint'], episodes)
+                    row = self.evaluate(stage, suite, task, checkpoint, episodes)
                     break
                 except Exception as exc:
                     # A failed evaluation is discarded whole and rerun from scratch; training is never redone.
@@ -182,6 +192,7 @@ def main():
     p.add_argument('--streams', required=True, help='comma list of method:suite')
     p.add_argument('--preflight', action='store_true')
     a = p.parse_args()
+    RUN.mkdir(parents=True, exist_ok=True)
     lane = Lane(a.gpu)
     lock = (RUN / f'lane_gpu{a.gpu}.lock').open('w')
     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)

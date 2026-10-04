@@ -18,12 +18,7 @@ import os
 from pathlib import Path
 import numpy as np
 
-ROOT = Path('/data2/vla-reasoning/proj')
-ASSETS = ROOT / 'XPolicyLab-assets'
-RUN = Path(os.environ.get('V1_RUN', str(ASSETS / 'baselines/pi05_libero_v1_fmn')))
-DATA = ASSETS / 'datasets/libero_pi_lerobot'
-BASE = ASSETS / 'checkpoints/cl_base/pi05_base'
-OPENPI = ROOT / 'XPolicyLab-upstreams/openpi-robocasa'
+from paths import ROOT, ASSETS, RUN, DATA, BASE, OPENPI, resolve_data_path
 SUITES = ['libero_spatial', 'libero_object', 'libero_goal', 'libero_10']
 HORIZONS = dict(zip(SUITES, [220, 280, 300, 520]))
 STEPS_PER_TASK = 10000
@@ -85,7 +80,7 @@ class LeRobotTask:
         self.instruction = task['instruction']
         self.states, self.actions, self.images, self.wrists = [], [], [], []
         for path in task['episode_files']:
-            t = pq.read_table(path, columns=['image', 'wrist_image', 'state', 'actions', 'frame_index', 'task_index'])
+            t = pq.read_table(resolve_data_path(path), columns=['image', 'wrist_image', 'state', 'actions', 'frame_index', 'task_index'])
             frames = t.column('frame_index').to_numpy()
             assert (frames == np.arange(len(frames))).all(), path
             assert set(t.column('task_index').to_numpy().tolist()) == {task['task_index']}, path
@@ -112,6 +107,42 @@ class LeRobotTask:
                 'observation/wrist_image': decode(self.wrists[episode][frame]),
                 'actions': self.actions[episode][indices].copy(), 'prompt': self.instruction}
 
-def load_norm(suite):
+def load_manifest(stream=None):
+    metadata = Path(stream) / 'metadata' if stream is not None else RUN
+    if stream is not None and not metadata.exists():
+        metadata = RUN
+    return json.loads((metadata / 'manifest.json').read_text())
+
+
+def load_norm(suite, stream=None):
     from openpi.shared import normalize
-    return normalize.load(RUN / 'norm' / suite)
+    metadata = Path(stream) / 'metadata' if stream is not None else RUN
+    if stream is not None and not metadata.exists():
+        metadata = RUN
+    return normalize.load(metadata / 'norm' / suite)
+
+
+def ensure_stream_metadata(stream, suite):
+    """Snapshot portable data references and exact normalization, without recomputation."""
+    import shutil
+    import tempfile
+    from paths import relative_path
+    stream = Path(stream)
+    destination = stream / 'metadata'
+    if destination.exists():
+        # An incomplete copy must fail instead of silently using different metadata.
+        load_manifest(stream)[suite]
+        if not (destination / 'norm' / suite / 'norm_stats.json').is_file():
+            raise FileNotFoundError(f'Missing stream normalization: {destination}')
+        return
+    manifest = load_manifest()
+    entries = manifest[suite]
+    for entry in entries:
+        entry['episode_files'] = [relative_path(resolve_data_path(p), DATA) for p in entry['episode_files']]
+        entry['episode_path_base'] = 'V1_DATA'
+    stream.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='.metadata-', dir=stream) as temporary:
+        staging = Path(temporary) / 'metadata'
+        write_json(staging / 'manifest.json', {suite: entries})
+        shutil.copytree(RUN / 'norm' / suite, staging / 'norm' / suite)
+        staging.rename(destination)

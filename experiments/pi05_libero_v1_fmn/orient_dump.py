@@ -4,12 +4,13 @@ import numpy as np
 from PIL import Image
 import pyarrow.parquet as pq
 from common import RUN, SUITES
+from paths import resolve_data_path
 manifest = json.loads((RUN / 'manifest.json').read_text())
 out = {}
 for suite in SUITES:
     frames = []
     for path in manifest[suite][0]['episode_files'][:10]:
-        t = pq.read_table(path, columns=['image'])
+        t = pq.read_table(resolve_data_path(path), columns=['image'])
         frames.append(np.asarray(Image.open(io.BytesIO(t.column('image')[0].as_py()['bytes'])).convert('RGB')))
     out[suite] = np.stack(frames)
 np.savez_compressed(RUN / 'orient_frames.npz', **out)

@@ -10,8 +10,9 @@ import time
 from pathlib import Path
 import numpy as np
 from common import (OPENPI, RUN, STEPS_PER_TASK, CURRENT_BATCH, REPLAY_PER_TASK, LeRobotTask,
-                    make_config, load_norm, write_json)
+                    make_config, load_norm, write_json, load_manifest, ensure_stream_metadata)
 from gpu_guard import Guard
+from paths import resolve_checkpoint, relative_path
 
 def main():
     p = argparse.ArgumentParser()
@@ -32,13 +33,14 @@ def main():
     np.random.seed(42)
     assert jax.device_count() == 1, jax.devices()
     spt = args.steps_per_task
-    manifest = json.loads((RUN / 'manifest.json').read_text())[args.suite]
     stream = args.root / args.method / args.suite
     stage = stream / f'task{args.task:02d}'
     stage.mkdir(parents=True, exist_ok=True)
     previous = stream / f'task{args.task-1:02d}'
     begin_step, end_step = spt * args.task, spt * (args.task + 1)
-    norms = load_norm(args.suite)
+    ensure_stream_metadata(stream, args.suite)
+    manifest = load_manifest(stream)[args.suite]
+    norms = load_norm(args.suite, stream)
     current = LeRobotTask(manifest[args.task])
     effective_batch = 2 * CURRENT_BATCH if args.method == 'er' and args.task else CURRENT_BATCH
     config = make_config(norms, stage, effective_batch, end_step)
@@ -77,7 +79,7 @@ def main():
         source = 'carry_from_previous_task'
         prev_trained = json.loads((previous / 'trained.json').read_text())
         assert prev_trained['end_step'] == begin_step, prev_trained
-        prev_manager, ok = checkpoints.initialize_checkpoint_dir(Path(prev_trained['checkpoint']).parent,
+        prev_manager, ok = checkpoints.initialize_checkpoint_dir(resolve_checkpoint(stream, prev_trained['checkpoint'], args.task - 1).parent,
             keep_period=None, overwrite=False, resume=True)
         assert ok, 'previous task checkpoint missing'
         assert begin_step in prev_manager.all_steps(), (begin_step, prev_manager.all_steps())
@@ -174,7 +176,7 @@ def main():
         # Fixed random subset reused for the rest of the stream (Continual-VLAs create_deterministic_buffer).
         indices = np.random.RandomState(42 + args.task).choice(len(current), min(REPLAY_PER_TASK, len(current)), replace=False)
         write_json(stage / 'buffer.json', dict(indices=sorted(indices.tolist()), frames=len(current), task=args.task))
-    write_json(stage / 'trained.json', dict(checkpoint=str(checkpoint), begin_step=begin_step, end_step=end_step,
+    write_json(stage / 'trained.json', dict(checkpoint=relative_path(checkpoint, stream), checkpoint_path_base='stream', begin_step=begin_step, end_step=end_step,
         seconds=time.monotonic() - began, finished_at=time.time(), preflight=args.preflight))
     manager.close()
     gpu_guard.close()
