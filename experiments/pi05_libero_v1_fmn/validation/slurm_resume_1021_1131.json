@@ -4,7 +4,7 @@
   "initial_job": "1021",
   "resumed_job": "1131",
   "restoration_checks_passed": true,
-  "full_task_validation_passed": null,
+  "full_task_validation_passed": true,
   "skip_completed_tasks_verified": false,
   "cancellation": {
     "initial_job": "1021",
@@ -155,5 +155,695 @@
     "task": 0,
     "job_id": "1131"
   },
-  "resumed_scheduler_at_check": "JobId=1131 JobName=v1_sf_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=RUNNING Reason=None Dependency=(null)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:50:44 TimeLimit=3-00:00:00 TimeMin=N/A\n   SubmitTime=2026-10-04T02:49:25 EligibleTime=2026-10-04T02:49:25\n   AccrueTime=2026-10-04T02:49:25\n   StartTime=2026-10-04T04:25:45 EndTime=2026-10-07T04:25:45 Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-04T04:25:45 Scheduler=Main\n   Partition=gpu AllocNode:Sid=ucrtasl:3881683\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=ucrtasl\n   BatchHost=ucrtasl\n   NumNodes=1 NumCPUs=12 NumTasks=1 CPUs/Task=12 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=12,mem=60G,node=1,billing=12\n   AllocTRES=cpu=12,mem=60G,node=1,billing=12\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=12 MinMemoryNode=60G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --parsable --partition=gpu --time=3-00:00:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=12 --mem=60G --job-name=v1_sf_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method sf --suite libero_spatial --tasks 1\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/v1_sf_libero_spatial-1131.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=12\n\n"
+  "resumed_scheduler_at_check": "JobId=1131 JobName=v1_sf_libero_spatial\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=RUNNING Reason=None Dependency=(null)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   RunTime=00:50:44 TimeLimit=3-00:00:00 TimeMin=N/A\n   SubmitTime=2026-10-04T02:49:25 EligibleTime=2026-10-04T02:49:25\n   AccrueTime=2026-10-04T02:49:25\n   StartTime=2026-10-04T04:25:45 EndTime=2026-10-07T04:25:45 Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-04T04:25:45 Scheduler=Main\n   Partition=gpu AllocNode:Sid=ucrtasl:3881683\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=ucrtasl\n   BatchHost=ucrtasl\n   NumNodes=1 NumCPUs=12 NumTasks=1 CPUs/Task=12 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=12,mem=60G,node=1,billing=12\n   AllocTRES=cpu=12,mem=60G,node=1,billing=12\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   MinCPUsNode=12 MinMemoryNode=60G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --parsable --partition=gpu --time=3-00:00:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=12 --mem=60G --job-name=v1_sf_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method sf --suite libero_spatial --tasks 1\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/036a60a9d71c5f8da6697304185d4a90e3f4179a/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/v1_sf_libero_spatial-1131.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=12\n\n",
+  "full_task_result": {
+    "trained": {
+      "checkpoint": "task00/checkpoints/pi05_libero_cl/stage/10000",
+      "checkpoint_path_base": "stream",
+      "checkpoint_complete": true,
+      "begin_step": 0,
+      "end_step": 10000,
+      "seconds": 7102.362063643988,
+      "finished_at": 1791120361.318954,
+      "preflight": false
+    },
+    "evaluated": {
+      "row": {
+        "0": 1.0
+      },
+      "episodes": 50,
+      "total_episodes": 50,
+      "finished_at": 1791120467.4443555,
+      "job_id": "1131"
+    },
+    "worker_results": [
+      {
+        "suite": "libero_spatial",
+        "stage": 0,
+        "worker": 0,
+        "episodes": [
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 0,
+            "seed": 42,
+            "success": true,
+            "steps": 80,
+            "seconds": 9.834309867001139,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120403.0092545
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 4,
+            "seed": 46,
+            "success": true,
+            "steps": 70,
+            "seconds": 5.28118423599517,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120408.2910058
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 8,
+            "seed": 50,
+            "success": true,
+            "steps": 76,
+            "seconds": 5.785950421006419,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120414.0774236
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 12,
+            "seed": 54,
+            "success": true,
+            "steps": 77,
+            "seconds": 5.3722182429919485,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120419.4502306
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 16,
+            "seed": 58,
+            "success": true,
+            "steps": 74,
+            "seconds": 4.925740222999593,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120424.3767862
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 20,
+            "seed": 62,
+            "success": true,
+            "steps": 80,
+            "seconds": 5.313971690018661,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120429.6912725
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 24,
+            "seed": 66,
+            "success": true,
+            "steps": 75,
+            "seconds": 5.287405703013064,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120434.9791763
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 28,
+            "seed": 70,
+            "success": true,
+            "steps": 69,
+            "seconds": 4.910661133006215,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120439.8905857
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 32,
+            "seed": 74,
+            "success": true,
+            "steps": 82,
+            "seconds": 5.566010792012094,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120445.4571514
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 36,
+            "seed": 78,
+            "success": true,
+            "steps": 69,
+            "seconds": 4.890194589010207,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120450.3479354
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 40,
+            "seed": 82,
+            "success": true,
+            "steps": 67,
+            "seconds": 4.904304344003322,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120455.252784
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 44,
+            "seed": 86,
+            "success": true,
+            "steps": 65,
+            "seconds": 4.67258180200588,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120459.9259458
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 48,
+            "seed": 90,
+            "success": true,
+            "steps": 69,
+            "seconds": 4.119391666987212,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120464.0461385
+          }
+        ]
+      },
+      {
+        "suite": "libero_spatial",
+        "stage": 0,
+        "worker": 1,
+        "episodes": [
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 1,
+            "seed": 43,
+            "success": true,
+            "steps": 70,
+            "seconds": 9.439548328984529,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120402.6496727
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 5,
+            "seed": 47,
+            "success": true,
+            "steps": 72,
+            "seconds": 5.683698057982838,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120408.3339481
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 9,
+            "seed": 51,
+            "success": true,
+            "steps": 72,
+            "seconds": 5.863303596008336,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120414.1978269
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 13,
+            "seed": 55,
+            "success": true,
+            "steps": 139,
+            "seconds": 8.68172928300919,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120422.880204
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 17,
+            "seed": 59,
+            "success": true,
+            "steps": 70,
+            "seconds": 4.9981288890121505,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120427.8788688
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 21,
+            "seed": 63,
+            "success": true,
+            "steps": 66,
+            "seconds": 4.815332271013176,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120432.694725
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 25,
+            "seed": 67,
+            "success": true,
+            "steps": 73,
+            "seconds": 5.008548324985895,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120437.703775
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 29,
+            "seed": 71,
+            "success": true,
+            "steps": 66,
+            "seconds": 4.899323418008862,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120442.6036134
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 33,
+            "seed": 75,
+            "success": true,
+            "steps": 70,
+            "seconds": 4.848683130985592,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120447.4532688
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 37,
+            "seed": 79,
+            "success": true,
+            "steps": 74,
+            "seconds": 5.350207300012698,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120452.8041575
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 41,
+            "seed": 83,
+            "success": true,
+            "steps": 72,
+            "seconds": 4.895300882024458,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120457.7000053
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 45,
+            "seed": 87,
+            "success": true,
+            "steps": 65,
+            "seconds": 4.022691887017572,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120461.7232656
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 49,
+            "seed": 91,
+            "success": true,
+            "steps": 76,
+            "seconds": 4.185855521005578,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120465.9098966
+          }
+        ]
+      },
+      {
+        "suite": "libero_spatial",
+        "stage": 0,
+        "worker": 2,
+        "episodes": [
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 2,
+            "seed": 44,
+            "success": true,
+            "steps": 84,
+            "seconds": 9.124507200001972,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120402.3405292
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 6,
+            "seed": 48,
+            "success": true,
+            "steps": 71,
+            "seconds": 5.673870989994612,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120408.015125
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 10,
+            "seed": 52,
+            "success": true,
+            "steps": 73,
+            "seconds": 6.330192587018246,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120414.346007
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 14,
+            "seed": 56,
+            "success": true,
+            "steps": 87,
+            "seconds": 6.4339924920059275,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120420.7808304
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 18,
+            "seed": 60,
+            "success": true,
+            "steps": 84,
+            "seconds": 5.950738762010587,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120426.7322826
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 22,
+            "seed": 64,
+            "success": true,
+            "steps": 77,
+            "seconds": 5.444760137994308,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120432.1777296
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 26,
+            "seed": 68,
+            "success": true,
+            "steps": 73,
+            "seconds": 5.556347288977122,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120437.7352953
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 30,
+            "seed": 72,
+            "success": true,
+            "steps": 67,
+            "seconds": 5.040317031001905,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120442.7763247
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 34,
+            "seed": 76,
+            "success": true,
+            "steps": 72,
+            "seconds": 5.169623504014453,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120447.9466689
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 38,
+            "seed": 80,
+            "success": true,
+            "steps": 73,
+            "seconds": 5.4937214859819505,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120453.442078
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 42,
+            "seed": 84,
+            "success": true,
+            "steps": 80,
+            "seconds": 5.694649432989536,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120459.1380231
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 46,
+            "seed": 88,
+            "success": true,
+            "steps": 74,
+            "seconds": 4.463624775991775,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120463.6026905
+          }
+        ]
+      },
+      {
+        "suite": "libero_spatial",
+        "stage": 0,
+        "worker": 3,
+        "episodes": [
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 3,
+            "seed": 45,
+            "success": true,
+            "steps": 75,
+            "seconds": 8.06024385499768,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120401.2053778
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 7,
+            "seed": 49,
+            "success": true,
+            "steps": 90,
+            "seconds": 6.435151301004225,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120407.6412573
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 11,
+            "seed": 53,
+            "success": true,
+            "steps": 68,
+            "seconds": 4.982013454020489,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120412.62397
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 15,
+            "seed": 57,
+            "success": true,
+            "steps": 74,
+            "seconds": 4.902977802994428,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120417.5276244
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 19,
+            "seed": 61,
+            "success": true,
+            "steps": 77,
+            "seconds": 5.539845265011536,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120423.0681427
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 23,
+            "seed": 65,
+            "success": true,
+            "steps": 74,
+            "seconds": 5.141084565024357,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120428.2100816
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 27,
+            "seed": 69,
+            "success": true,
+            "steps": 82,
+            "seconds": 5.732258522999473,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120433.9430275
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 31,
+            "seed": 73,
+            "success": true,
+            "steps": 69,
+            "seconds": 5.011939414020162,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120438.9556408
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 35,
+            "seed": 77,
+            "success": true,
+            "steps": 70,
+            "seconds": 4.936115051998058,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120443.8924673
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 39,
+            "seed": 81,
+            "success": true,
+            "steps": 71,
+            "seconds": 5.139242620993173,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120449.0322716
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 43,
+            "seed": 85,
+            "success": true,
+            "steps": 70,
+            "seconds": 4.963529895001557,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120453.9965243
+          },
+          {
+            "task": 0,
+            "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+            "episode": 47,
+            "seed": 89,
+            "success": true,
+            "steps": 74,
+            "seconds": 5.184063985012472,
+            "horizon": 220,
+            "wait_steps": 10,
+            "timestamp": 1791120459.1811793
+          }
+        ]
+      }
+    ],
+    "successes": 50,
+    "episodes": 50,
+    "success_rate": 1.0,
+    "batch_exit": {
+      "job_id": "1131",
+      "batch_exit_code": 0,
+      "code_commit": "036a60a9d71c5f8da6697304185d4a90e3f4179a",
+      "timestamp": 1791120476.7739687,
+      "source": "batch EXIT trap after srun; not scheduler terminal state"
+    },
+    "lane_status": {
+      "phase": "completed",
+      "timestamp": 1791120476.725632,
+      "pid": 32365,
+      "job_id": "1131",
+      "cuda_visible_devices": "0",
+      "mode": "formal",
+      "code_commit": "036a60a9d71c5f8da6697304185d4a90e3f4179a",
+      "predecessor_job_id": null,
+      "tasks": 1
+    },
+    "scheduler_terminal_state": null,
+    "scheduler_terminal_state_note": "scontrol job record expired; batch EXIT trap and application completion verified independently",
+    "checkpoint_metadata": {
+      "item_handlers": {
+        "assets": "openpi.training.checkpoints.CallbackHandler",
+        "params": "orbax.checkpoint._src.handlers.pytree_checkpoint_handler.PyTreeCheckpointHandler",
+        "train_state": "orbax.checkpoint._src.handlers.pytree_checkpoint_handler.PyTreeCheckpointHandler"
+      },
+      "metrics": {},
+      "performance_metrics": {},
+      "init_timestamp_nsecs": 1791120333931391687,
+      "commit_timestamp_nsecs": 1791120361288900206,
+      "custom_metadata": {}
+    },
+    "retained_checkpoint_entries": [
+      "10000"
+    ],
+    "checked_at": 1791171146.4661121
+  }
 }
