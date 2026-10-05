@@ -341,7 +341,7 @@ SeqFT Spatial task00 的作业 1021 在 checkpoint 5000 完整提交后执行 sc
 1131 随后完成 10000 步，50 个不重复 episode（0–49，seed 42–91）全部成功，
 成功率 1.00，达到 >=0.90 的验收标准；lane 完成且 batch EXIT trap 记录退出码 0。
 复查时 Slurm 最终状态记录已过期，因此未确认调度器最终状态，不将 batch 记录冒充
-Slurm COMPLETED。已完成任务跳过已由作业 1865 核实（见下文）；双流并行尚待最终验收。
+Slurm COMPLETED。已完成任务跳过已由作业 1865 核实（见下文）；双流并行也已通过（见下文）。
 证据见 [validation/slurm_resume_1021_1131.json](validation/slurm_resume_1021_1131.json)。
 
 ## 已完成任务跳过：作业 1865
@@ -352,6 +352,16 @@ Slurm COMPLETED。已完成任务跳过已由作业 1865 核实（见下文）�
 仅 checkpoint 清理标记 checkpoints_retired.json 被原样重写，内容及大小未改变。
 证据见 [validation/slurm_skip_1865.json](validation/slurm_skip_1865.json)。
 
-并行冒烟 1863（Spatial）与 1864（Object）已同时运行，Slurm 分别分配物理 GPU 2、5；
+## 双流并行冒烟：1863 与 1864
+
+Spatial 作业 1863 与 Object 作业 1864 均为 Slurm COMPLETED / ExitCode=0:0，
+batch 退出码也均为 0。实际运行重叠 400 秒，物理 GPU 分别为 2、5；作业内均看到 cuda:0。
 固定代码 commit 59251995242d7cb14350bddec81d5b0fa2346cfe，快照关闭。
-这仅确认实际启动重叠与资源分配，两条流最终通过及端口互不冲突仍待核实。
+两条流分别完成全局 0→5→10，任务 1 的 Adam 动量非零、学习率连续，batch 当前 8 + 回放 8；
+每条流完成 2 + 4 个 episode，三格成功率均为 0（5 步冒烟不作为模型质量评测）。
+两套流锁和 job 状态文件独立，四轮评测使用的 16 个动态端口均不同；两流均完成清理并只保留最终 checkpoint。
+证据见 [validation/slurm_parallel_1863_1864.json](validation/slurm_parallel_1863_1864.json)。
+
+本轮 labserver 四项功能验证已通过：冒烟、完整单任务、中断恢复（含跳过已完成任务）和并行。
+SeqFT 完整单任务成功率为 50/50=1.00；1131 仅有已核实的 batch 退出码 0，
+Slurm 最终状态已过期这一限制仍保留。BCC 同 commit 冒烟及十任务快照开/关真实磁盘峰值仍未完成。
