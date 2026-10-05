@@ -1,0 +1,455 @@
+{
+  "passed": true,
+  "job_id": "1865",
+  "original_job_id": "1001",
+  "submission": {
+    "first_job": "1865",
+    "continuation_job": null,
+    "dependency": null,
+    "commit": "59251995242d7cb14350bddec81d5b0fa2346cfe",
+    "code": "/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/59251995242d7cb14350bddec81d5b0fa2346cfe/XPolicyLab/experiments/pi05_libero_v1_fmn",
+    "run": "/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004",
+    "method": "er",
+    "suite": "libero_spatial",
+    "tasks": 10,
+    "preflight": true,
+    "entry_check": false,
+    "chain_check": false,
+    "save_trainable_snapshots": true,
+    "submitted_at": 1791171218.9298568
+  },
+  "before": {
+    "stream": "/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/preflight/er/libero_spatial",
+    "files": {
+      "task00/metrics.jsonl": {
+        "sha256": "f3918d0fe892cd8ee9f458bf05d0cc4a511c5a752d6b97151d0b1247c00fccb4",
+        "bytes": 696,
+        "mtime_ns": 1791098987839777585
+      },
+      "task00/buffer.json": {
+        "sha256": "3d4bc27837b77ef0fc129d2dddf965ffd50599922d0cae2b8a1f8bd02d1d3b7a",
+        "bytes": 9802,
+        "mtime_ns": 1791099021235778709
+      },
+      "task00/resume_history.jsonl": {
+        "sha256": "d115202c1f00eee512a6baf1da789a37e138be54f587db7e25ea9905f02a2c40",
+        "bytes": 255,
+        "mtime_ns": 1791098863563773404
+      },
+      "task00/evaluated.json": {
+        "sha256": "a70af631f49084af2d021300958e026472f82ec6717244b60afa2a1b1b09912c",
+        "bytes": 128,
+        "mtime_ns": 1791099095607781211
+      },
+      "task00/progress.json": {
+        "sha256": "2209998c04fdbb714b423df8045f4882629619ba6906e5cc37c2ebd1e2c888bd",
+        "bytes": 379,
+        "mtime_ns": 1791098987843777585
+      },
+      "task00/run_config.json": {
+        "sha256": "f54f5d6f5e9a41bcc74162084df7e131dd1af60a8fa9815c6b27dd1e3d99a8f5",
+        "bytes": 1584,
+        "mtime_ns": 1791098863571773405
+      },
+      "task00/trained.json": {
+        "sha256": "7d28a2ee2d83f83c5cdac6ca61942a5e514f6cc33ddfe8d313026340ae0edc6d",
+        "bytes": 257,
+        "mtime_ns": 1791099021235778709
+      },
+      "task00/checkpoints_retired.json": {
+        "sha256": "14eac1e0974524bdbd7abbf54ab7cc8d40284982afb9eb6270e5432041839dd5",
+        "bytes": 48,
+        "mtime_ns": 1791099330811789123
+      },
+      "task00/train.log": {
+        "sha256": "c61d3e14eb730cd055fa77e2d66eb90b15207a871fa78212ee351f7801356771",
+        "bytes": 12537,
+        "mtime_ns": 1791099021235778709
+      },
+      "task00/evaluation/server3.log": {
+        "sha256": "0fc9ea36a8b74ef12aced9fd24bb04e9db66919f7f4489b470c3e8fc7c4776a1",
+        "bytes": 2045,
+        "mtime_ns": 1791099043547779459
+      },
+      "task00/evaluation/client0.log": {
+        "sha256": "7500d4758b12d0c0d2cb5e8bda0e677b415dc03b8b16d505b6971c4e78d6c3d8",
+        "bytes": 2981,
+        "mtime_ns": 1791099092747781114
+      },
+      "task00/evaluation/server0.log": {
+        "sha256": "0fc9ea36a8b74ef12aced9fd24bb04e9db66919f7f4489b470c3e8fc7c4776a1",
+        "bytes": 2045,
+        "mtime_ns": 1791099041715779398
+      },
+      "task00/evaluation/worker0.json": {
+        "sha256": "30e4d781e1d8c284ace9fce6a8250c3ad38b21d96d2f612c2710d70ddbc7d4ef",
+        "bytes": 418,
+        "mtime_ns": 1791099092747781114
+      },
+      "task00/evaluation/client3.log": {
+        "sha256": "9da7e2d4da3513a7dc401b60a36aa7021155e8f41e43e8df25d3e98c851baceb",
+        "bytes": 2702,
+        "mtime_ns": 1791099045627779529
+      },
+      "task00/evaluation/worker2.json": {
+        "sha256": "b1c2b452a12542b5036d1657bd0edbd6c832e1597712a54f54de9d6530505a06",
+        "bytes": 79,
+        "mtime_ns": 1791099045303779518
+      },
+      "task00/evaluation/client2.log": {
+        "sha256": "80e262ce838e41a77f2c2682931a17f127fc0860438d19203a376363d05785e6",
+        "bytes": 2702,
+        "mtime_ns": 1791099045655779530
+      },
+      "task00/evaluation/client1.log": {
+        "sha256": "7b9312c967252b2ecadef9ca78f4e46439a39c2f72ff6efa15761a86457475da",
+        "bytes": 2981,
+        "mtime_ns": 1791099094179781163
+      },
+      "task00/evaluation/worker1.json": {
+        "sha256": "3c037988a4ef3193198d7dbcdcf8843dcb62465bb6cfaa616a32f51777d4aa35",
+        "bytes": 418,
+        "mtime_ns": 1791099094179781163
+      },
+      "task00/evaluation/server2.log": {
+        "sha256": "0fc9ea36a8b74ef12aced9fd24bb04e9db66919f7f4489b470c3e8fc7c4776a1",
+        "bytes": 2045,
+        "mtime_ns": 1791099040315779350
+      },
+      "task00/evaluation/server1.log": {
+        "sha256": "0fc9ea36a8b74ef12aced9fd24bb04e9db66919f7f4489b470c3e8fc7c4776a1",
+        "bytes": 2045,
+        "mtime_ns": 1791099041335779385
+      },
+      "task00/evaluation/worker3.json": {
+        "sha256": "bb2daee6bedc180d19d6a4a44d3e930666d6ccc8fd08e3173332780c501046f9",
+        "bytes": 79,
+        "mtime_ns": 1791099045323779519
+      },
+      "task01/metrics.jsonl": {
+        "sha256": "4ec1c0483fea3cb7a8ba2b52a176fbf1b44cdbef74b84d0c6f8c1266417214c0",
+        "bytes": 699,
+        "mtime_ns": 1791099290963787783
+      },
+      "task01/buffer.json": {
+        "sha256": "c94714f9712c85e3e6737962ab1eba7a8d9eb4976b1fde7701f4ef93c3e47d21",
+        "bytes": 9888,
+        "mtime_ns": 1791099323187788867
+      },
+      "task01/resume_history.jsonl": {
+        "sha256": "d4c24cf8403f1eacb6d14fb08f2dcf88e2fd3c107f8af7bcb4623b069572545a",
+        "bytes": 325,
+        "mtime_ns": 1791099118239781972
+      },
+      "task01/evaluated.json": {
+        "sha256": "2695a5564b42fe382311d3a3fce5b41e0a8af2289c634227b57060051146f6c4",
+        "bytes": 143,
+        "mtime_ns": 1791099377359790689
+      },
+      "task01/progress.json": {
+        "sha256": "a46eca147e77f78639c37e2e82c9655ca7f361721de08954983e9be3016e1bf1",
+        "bytes": 381,
+        "mtime_ns": 1791099290963787783
+      },
+      "task01/run_config.json": {
+        "sha256": "5fbcdb13b94b498f9219e63630d899ee3dbbacc46d9d77fc1b35dc2f09295211",
+        "bytes": 1655,
+        "mtime_ns": 1791099118243781972
+      },
+      "task01/trained.json": {
+        "sha256": "25bb3f9d105455c1acf6607adb3cadc7e6d7e43e5a0fc7949805c3d790ad3c4e",
+        "bytes": 260,
+        "mtime_ns": 1791099323187788867
+      },
+      "task01/train.log": {
+        "sha256": "907d070cce4999105c9eec7a30a91d36ca99c84b1021788bd4b72db8314378cb",
+        "bytes": 20858,
+        "mtime_ns": 1791099323187788867
+      },
+      "task01/evaluation/server3.log": {
+        "sha256": "47c3b66d37daf8b10d02757ca11a2d6005dc5b9b5c715cdd7b9b16c7afb04271",
+        "bytes": 2046,
+        "mtime_ns": 1791099346451789649
+      },
+      "task01/evaluation/client0.log": {
+        "sha256": "5d7eca3a2da03878e29183d52a21a37dbdac04bf3424cab3311663fa2c9fd31b",
+        "bytes": 3793,
+        "mtime_ns": 1791099375791790637
+      },
+      "task01/evaluation/server0.log": {
+        "sha256": "47c3b66d37daf8b10d02757ca11a2d6005dc5b9b5c715cdd7b9b16c7afb04271",
+        "bytes": 2046,
+        "mtime_ns": 1791099346475789650
+      },
+      "task01/evaluation/worker0.json": {
+        "sha256": "22e516c4c29303a10f98aafc9cf50a1b29f6370ef68b9a768cb6c7c7208b29ee",
+        "bytes": 742,
+        "mtime_ns": 1791099375791790637
+      },
+      "task01/evaluation/client3.log": {
+        "sha256": "89072d5df9c5aba8aeaaa9dde6f40eafbd5f2234934de0d0b4e61955f69bfe3c",
+        "bytes": 3248,
+        "mtime_ns": 1791099352211789843
+      },
+      "task01/evaluation/worker2.json": {
+        "sha256": "99b87dd2e7c34b8aa9befa827d14aa4375721f952da8fe21ee78cd120ce3b8b1",
+        "bytes": 79,
+        "mtime_ns": 1791099348799789728
+      },
+      "task01/evaluation/client2.log": {
+        "sha256": "b9614cd20b5526a5c08250b5e94d90db0010018c9de764c14e49e4183d9303d1",
+        "bytes": 3248,
+        "mtime_ns": 1791099352107789840
+      },
+      "task01/evaluation/client1.log": {
+        "sha256": "270337a9ce0b64162a7beaff0f51ba013b3632e95275711a62cf194067c5f347",
+        "bytes": 3793,
+        "mtime_ns": 1791099376523790661
+      },
+      "task01/evaluation/worker1.json": {
+        "sha256": "de3f44a7edc2e5750f0334de46969593533eb0145aa438fc014e75457ea26a3d",
+        "bytes": 742,
+        "mtime_ns": 1791099376523790661
+      },
+      "task01/evaluation/server2.log": {
+        "sha256": "47c3b66d37daf8b10d02757ca11a2d6005dc5b9b5c715cdd7b9b16c7afb04271",
+        "bytes": 2046,
+        "mtime_ns": 1791099347323789679
+      },
+      "task01/evaluation/server1.log": {
+        "sha256": "47c3b66d37daf8b10d02757ca11a2d6005dc5b9b5c715cdd7b9b16c7afb04271",
+        "bytes": 2046,
+        "mtime_ns": 1791099345343789612
+      },
+      "task01/evaluation/worker3.json": {
+        "sha256": "59f0cf73f921ec845bca0463b271b53ec68d12bf017a84ead74a72cf3ec7704d",
+        "bytes": 79,
+        "mtime_ns": 1791099349003789735
+      }
+    },
+    "recorded_at": 1791171218.4145465,
+    "purpose": "Detect new training/evaluation records when resubmitting completed preflight"
+  },
+  "after": {
+    "task00/metrics.jsonl": {
+      "sha256": "f3918d0fe892cd8ee9f458bf05d0cc4a511c5a752d6b97151d0b1247c00fccb4",
+      "bytes": 696,
+      "mtime_ns": 1791098987839777585
+    },
+    "task00/buffer.json": {
+      "sha256": "3d4bc27837b77ef0fc129d2dddf965ffd50599922d0cae2b8a1f8bd02d1d3b7a",
+      "bytes": 9802,
+      "mtime_ns": 1791099021235778709
+    },
+    "task00/resume_history.jsonl": {
+      "sha256": "d115202c1f00eee512a6baf1da789a37e138be54f587db7e25ea9905f02a2c40",
+      "bytes": 255,
+      "mtime_ns": 1791098863563773404
+    },
+    "task00/evaluated.json": {
+      "sha256": "a70af631f49084af2d021300958e026472f82ec6717244b60afa2a1b1b09912c",
+      "bytes": 128,
+      "mtime_ns": 1791099095607781211
+    },
+    "task00/progress.json": {
+      "sha256": "2209998c04fdbb714b423df8045f4882629619ba6906e5cc37c2ebd1e2c888bd",
+      "bytes": 379,
+      "mtime_ns": 1791098987843777585
+    },
+    "task00/run_config.json": {
+      "sha256": "f54f5d6f5e9a41bcc74162084df7e131dd1af60a8fa9815c6b27dd1e3d99a8f5",
+      "bytes": 1584,
+      "mtime_ns": 1791098863571773405
+    },
+    "task00/trained.json": {
+      "sha256": "7d28a2ee2d83f83c5cdac6ca61942a5e514f6cc33ddfe8d313026340ae0edc6d",
+      "bytes": 257,
+      "mtime_ns": 1791099021235778709
+    },
+    "task00/checkpoints_retired.json": {
+      "sha256": "14eac1e0974524bdbd7abbf54ab7cc8d40284982afb9eb6270e5432041839dd5",
+      "bytes": 48,
+      "mtime_ns": 1791171235878208140
+    },
+    "task00/train.log": {
+      "sha256": "c61d3e14eb730cd055fa77e2d66eb90b15207a871fa78212ee351f7801356771",
+      "bytes": 12537,
+      "mtime_ns": 1791099021235778709
+    },
+    "task00/evaluation/server3.log": {
+      "sha256": "0fc9ea36a8b74ef12aced9fd24bb04e9db66919f7f4489b470c3e8fc7c4776a1",
+      "bytes": 2045,
+      "mtime_ns": 1791099043547779459
+    },
+    "task00/evaluation/client0.log": {
+      "sha256": "7500d4758b12d0c0d2cb5e8bda0e677b415dc03b8b16d505b6971c4e78d6c3d8",
+      "bytes": 2981,
+      "mtime_ns": 1791099092747781114
+    },
+    "task00/evaluation/server0.log": {
+      "sha256": "0fc9ea36a8b74ef12aced9fd24bb04e9db66919f7f4489b470c3e8fc7c4776a1",
+      "bytes": 2045,
+      "mtime_ns": 1791099041715779398
+    },
+    "task00/evaluation/worker0.json": {
+      "sha256": "30e4d781e1d8c284ace9fce6a8250c3ad38b21d96d2f612c2710d70ddbc7d4ef",
+      "bytes": 418,
+      "mtime_ns": 1791099092747781114
+    },
+    "task00/evaluation/client3.log": {
+      "sha256": "9da7e2d4da3513a7dc401b60a36aa7021155e8f41e43e8df25d3e98c851baceb",
+      "bytes": 2702,
+      "mtime_ns": 1791099045627779529
+    },
+    "task00/evaluation/worker2.json": {
+      "sha256": "b1c2b452a12542b5036d1657bd0edbd6c832e1597712a54f54de9d6530505a06",
+      "bytes": 79,
+      "mtime_ns": 1791099045303779518
+    },
+    "task00/evaluation/client2.log": {
+      "sha256": "80e262ce838e41a77f2c2682931a17f127fc0860438d19203a376363d05785e6",
+      "bytes": 2702,
+      "mtime_ns": 1791099045655779530
+    },
+    "task00/evaluation/client1.log": {
+      "sha256": "7b9312c967252b2ecadef9ca78f4e46439a39c2f72ff6efa15761a86457475da",
+      "bytes": 2981,
+      "mtime_ns": 1791099094179781163
+    },
+    "task00/evaluation/worker1.json": {
+      "sha256": "3c037988a4ef3193198d7dbcdcf8843dcb62465bb6cfaa616a32f51777d4aa35",
+      "bytes": 418,
+      "mtime_ns": 1791099094179781163
+    },
+    "task00/evaluation/server2.log": {
+      "sha256": "0fc9ea36a8b74ef12aced9fd24bb04e9db66919f7f4489b470c3e8fc7c4776a1",
+      "bytes": 2045,
+      "mtime_ns": 1791099040315779350
+    },
+    "task00/evaluation/server1.log": {
+      "sha256": "0fc9ea36a8b74ef12aced9fd24bb04e9db66919f7f4489b470c3e8fc7c4776a1",
+      "bytes": 2045,
+      "mtime_ns": 1791099041335779385
+    },
+    "task00/evaluation/worker3.json": {
+      "sha256": "bb2daee6bedc180d19d6a4a44d3e930666d6ccc8fd08e3173332780c501046f9",
+      "bytes": 79,
+      "mtime_ns": 1791099045323779519
+    },
+    "task01/metrics.jsonl": {
+      "sha256": "4ec1c0483fea3cb7a8ba2b52a176fbf1b44cdbef74b84d0c6f8c1266417214c0",
+      "bytes": 699,
+      "mtime_ns": 1791099290963787783
+    },
+    "task01/buffer.json": {
+      "sha256": "c94714f9712c85e3e6737962ab1eba7a8d9eb4976b1fde7701f4ef93c3e47d21",
+      "bytes": 9888,
+      "mtime_ns": 1791099323187788867
+    },
+    "task01/resume_history.jsonl": {
+      "sha256": "d4c24cf8403f1eacb6d14fb08f2dcf88e2fd3c107f8af7bcb4623b069572545a",
+      "bytes": 325,
+      "mtime_ns": 1791099118239781972
+    },
+    "task01/evaluated.json": {
+      "sha256": "2695a5564b42fe382311d3a3fce5b41e0a8af2289c634227b57060051146f6c4",
+      "bytes": 143,
+      "mtime_ns": 1791099377359790689
+    },
+    "task01/progress.json": {
+      "sha256": "a46eca147e77f78639c37e2e82c9655ca7f361721de08954983e9be3016e1bf1",
+      "bytes": 381,
+      "mtime_ns": 1791099290963787783
+    },
+    "task01/run_config.json": {
+      "sha256": "5fbcdb13b94b498f9219e63630d899ee3dbbacc46d9d77fc1b35dc2f09295211",
+      "bytes": 1655,
+      "mtime_ns": 1791099118243781972
+    },
+    "task01/trained.json": {
+      "sha256": "25bb3f9d105455c1acf6607adb3cadc7e6d7e43e5a0fc7949805c3d790ad3c4e",
+      "bytes": 260,
+      "mtime_ns": 1791099323187788867
+    },
+    "task01/train.log": {
+      "sha256": "907d070cce4999105c9eec7a30a91d36ca99c84b1021788bd4b72db8314378cb",
+      "bytes": 20858,
+      "mtime_ns": 1791099323187788867
+    },
+    "task01/evaluation/server3.log": {
+      "sha256": "47c3b66d37daf8b10d02757ca11a2d6005dc5b9b5c715cdd7b9b16c7afb04271",
+      "bytes": 2046,
+      "mtime_ns": 1791099346451789649
+    },
+    "task01/evaluation/client0.log": {
+      "sha256": "5d7eca3a2da03878e29183d52a21a37dbdac04bf3424cab3311663fa2c9fd31b",
+      "bytes": 3793,
+      "mtime_ns": 1791099375791790637
+    },
+    "task01/evaluation/server0.log": {
+      "sha256": "47c3b66d37daf8b10d02757ca11a2d6005dc5b9b5c715cdd7b9b16c7afb04271",
+      "bytes": 2046,
+      "mtime_ns": 1791099346475789650
+    },
+    "task01/evaluation/worker0.json": {
+      "sha256": "22e516c4c29303a10f98aafc9cf50a1b29f6370ef68b9a768cb6c7c7208b29ee",
+      "bytes": 742,
+      "mtime_ns": 1791099375791790637
+    },
+    "task01/evaluation/client3.log": {
+      "sha256": "89072d5df9c5aba8aeaaa9dde6f40eafbd5f2234934de0d0b4e61955f69bfe3c",
+      "bytes": 3248,
+      "mtime_ns": 1791099352211789843
+    },
+    "task01/evaluation/worker2.json": {
+      "sha256": "99b87dd2e7c34b8aa9befa827d14aa4375721f952da8fe21ee78cd120ce3b8b1",
+      "bytes": 79,
+      "mtime_ns": 1791099348799789728
+    },
+    "task01/evaluation/client2.log": {
+      "sha256": "b9614cd20b5526a5c08250b5e94d90db0010018c9de764c14e49e4183d9303d1",
+      "bytes": 3248,
+      "mtime_ns": 1791099352107789840
+    },
+    "task01/evaluation/client1.log": {
+      "sha256": "270337a9ce0b64162a7beaff0f51ba013b3632e95275711a62cf194067c5f347",
+      "bytes": 3793,
+      "mtime_ns": 1791099376523790661
+    },
+    "task01/evaluation/worker1.json": {
+      "sha256": "de3f44a7edc2e5750f0334de46969593533eb0145aa438fc014e75457ea26a3d",
+      "bytes": 742,
+      "mtime_ns": 1791099376523790661
+    },
+    "task01/evaluation/server2.log": {
+      "sha256": "47c3b66d37daf8b10d02757ca11a2d6005dc5b9b5c715cdd7b9b16c7afb04271",
+      "bytes": 2046,
+      "mtime_ns": 1791099347323789679
+    },
+    "task01/evaluation/server1.log": {
+      "sha256": "47c3b66d37daf8b10d02757ca11a2d6005dc5b9b5c715cdd7b9b16c7afb04271",
+      "bytes": 2046,
+      "mtime_ns": 1791099345343789612
+    },
+    "task01/evaluation/worker3.json": {
+      "sha256": "59f0cf73f921ec845bca0463b271b53ec68d12bf017a84ead74a72cf3ec7704d",
+      "bytes": 79,
+      "mtime_ns": 1791099349003789735
+    }
+  },
+  "content_changed_files": [],
+  "mtime_changed_files": [
+    "task00/checkpoints_retired.json"
+  ],
+  "mtime_change_explanation": "retention.after_training rewrites the identical checkpoint retirement marker; all training/evaluation records unchanged in content, size, mtime and file set",
+  "log": "SLURM_JOB_ID=1865 host=ucrtasl code=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/59251995242d7cb14350bddec81d5b0fa2346cfe/XPolicyLab/experiments/pi05_libero_v1_fmn commit=59251995242d7cb14350bddec81d5b0fa2346cfe predecessor=none\nLANE_STATUS {\"phase\": \"starting\", \"timestamp\": 1791171235.8680286, \"pid\": 3175539, \"job_id\": \"1865\", \"cuda_visible_devices\": \"0\", \"mode\": \"preflight\", \"code_commit\": \"59251995242d7cb14350bddec81d5b0fa2346cfe\", \"predecessor_job_id\": null, \"method\": \"er\", \"suite\": \"libero_spatial\"}\nSTAGE_SKIPPED er libero_spatial 0\nSTAGE_DONE er libero_spatial 0 {\"0\": 0.0}\nSTAGE_SKIPPED er libero_spatial 1\nSTAGE_DONE er libero_spatial 1 {\"0\": 0.0, \"1\": 0.0}\nLANE_STATUS {\"phase\": \"preflight_passed\", \"timestamp\": 1791171235.8882573, \"pid\": 3175539, \"job_id\": \"1865\", \"cuda_visible_devices\": \"0\", \"mode\": \"preflight\", \"code_commit\": \"59251995242d7cb14350bddec81d5b0fa2346cfe\", \"predecessor_job_id\": null, \"tasks\": 2}\n",
+  "batch_exit": {
+    "job_id": "1865",
+    "batch_exit_code": 0,
+    "code_commit": "59251995242d7cb14350bddec81d5b0fa2346cfe",
+    "timestamp": 1791171235.9220514,
+    "source": "batch EXIT trap after srun; not scheduler terminal state"
+  },
+  "scheduler_terminal": "JobId=1865 JobName=v1_er_libero_spatial\n   SLUID=s67NM451ZKFG00\n   UserId=vla-reasoning(1023) GroupId=vla-reasoning(1023) MCS_label=N/A\n   Priority=1 Nice=0 Account=(null) QOS=(null)\n   JobState=COMPLETED Reason=None Dependency=(null)\n   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0\n   DerivedExitCode=0:0\n   RunTime=00:00:01 TimeLimit=3-00:00:00 TimeMin=N/A\n   SubmitTime=2026-10-04T20:33:38 EligibleTime=2026-10-04T20:33:38\n   AccrueTime=2026-10-04T20:33:38\n   StartTime=2026-10-04T20:33:54 EndTime=2026-10-04T20:33:55 Deadline=N/A\n   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-04T20:33:54 Scheduler=Main\n   Partition=gpu AllocNode:Sid=ucrtasl:3174787\n   ReqNodeList=(null) ExcNodeList=(null)\n   NodeList=ucrtasl\n   BatchHost=ucrtasl\n   NumNodes=1 NumCPUs=12 NumTasks=1 CPUs/Task=12 ReqB:S:C:T=0:0:*:*\n   ReqTRES=cpu=12,mem=60G,node=1,billing=12\n   AllocTRES=cpu=12,mem=60G,node=1,billing=12\n   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*\n   JOB_GRES=gpu:rtx6000ada:1\n     Nodes=ucrtasl CPU_IDs=0-1,48-49,64-71 Mem=61440 GRES=\n   MinCPUsNode=12 MinMemoryNode=60G MinTmpDiskNode=0\n   Features=(null) DelayBoot=00:00:00\n   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)\n   Command=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/59251995242d7cb14350bddec81d5b0fa2346cfe/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch\n   SubmitLine=sbatch --parsable --partition=gpu --time=3-00:00:00 --nodes=1 --ntasks=1 --gres=gpu:1 --cpus-per-task=12 --mem=60G --job-name=v1_er_libero_spatial --output=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/%x-%j.log --chdir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/59251995242d7cb14350bddec81d5b0fa2346cfe/XPolicyLab/experiments/pi05_libero_v1_fmn --export=ALL /data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/59251995242d7cb14350bddec81d5b0fa2346cfe/XPolicyLab/experiments/pi05_libero_v1_fmn/labserver.sbatch --method er --suite libero_spatial --tasks 10 --preflight --save-trainable-snapshots\n   WorkDir=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/code_snapshots/59251995242d7cb14350bddec81d5b0fa2346cfe/XPolicyLab/experiments/pi05_libero_v1_fmn\n   StdErr=\n   StdIn=/dev/null\n   StdOut=/data2/vla-reasoning/proj/XPolicyLab-assets/baselines/pi05_libero_v1_validation_20261004/slurm/v1_er_libero_spatial-1865.log\n   TresPerNode=gres/gpu:1\n   TresPerTask=cpu=12\n\n",
+  "checked_at": 1791171405.423351
+}

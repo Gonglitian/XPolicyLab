@@ -1,11 +1,11 @@
 {
-  "scope": "Real mid-task scancel and checkpoint restoration; full-task evaluation still pending",
+  "scope": "Real Slurm cancellation and restoration at checkpoint 5000, completed 10000-step task with 50 evaluations; completed-task skipping verified separately",
   "checked_at": 1791116240.58772,
   "initial_job": "1021",
   "resumed_job": "1131",
   "restoration_checks_passed": true,
   "full_task_validation_passed": true,
-  "skip_completed_tasks_verified": false,
+  "skip_completed_tasks_verified": true,
   "cancellation": {
     "initial_job": "1021",
     "requested_at": 1791107297.47976,
@@ -845,5 +845,6 @@
       "10000"
     ],
     "checked_at": 1791171146.4661121
-  }
+  },
+  "skip_evidence": "slurm_skip_1865.json"
 }

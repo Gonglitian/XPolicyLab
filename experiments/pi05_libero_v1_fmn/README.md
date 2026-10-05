@@ -341,5 +341,17 @@ SeqFT Spatial task00 的作业 1021 在 checkpoint 5000 完整提交后执行 sc
 1131 随后完成 10000 步，50 个不重复 episode（0–49，seed 42–91）全部成功，
 成功率 1.00，达到 >=0.90 的验收标准；lane 完成且 batch EXIT trap 记录退出码 0。
 复查时 Slurm 最终状态记录已过期，因此未确认调度器最终状态，不将 batch 记录冒充
-Slurm COMPLETED。已完成任务跳过及双流并行仍待验收，四项尚未全部通过。
+Slurm COMPLETED。已完成任务跳过已由作业 1865 核实（见下文）；双流并行尚待最终验收。
 证据见 [validation/slurm_resume_1021_1131.json](validation/slurm_resume_1021_1131.json)。
+
+## 已完成任务跳过：作业 1865
+
+以同一 V1_RUN 和原冒烟命令（含 --save-trainable-snapshots）重提，
+1865 跳过 task00、task01，Slurm COMPLETED / ExitCode=0:0，batch 退出码 0。
+两任务训练、恢复、评测日志及 JSON 记录的文件集合、SHA256、大小和修改时间均未改变。
+仅 checkpoint 清理标记 checkpoints_retired.json 被原样重写，内容及大小未改变。
+证据见 [validation/slurm_skip_1865.json](validation/slurm_skip_1865.json)。
+
+并行冒烟 1863（Spatial）与 1864（Object）已同时运行，Slurm 分别分配物理 GPU 2、5；
+固定代码 commit 59251995242d7cb14350bddec81d5b0fa2346cfe，快照关闭。
+这仅确认实际启动重叠与资源分配，两条流最终通过及端口互不冲突仍待核实。
