@@ -174,7 +174,7 @@ def update_group_lrs(optim, step, args):
 # ============================================================
 # Main Training
 # ============================================================
-def main(args):
+def main(args, *, dataloader_factory=None, model_factory=None):
     output_dir = Path(args.output_dir)
     accelerator = Accelerator(
         log_with="tensorboard", 
@@ -189,11 +189,11 @@ def main(args):
     logger.info(f"Args: {args}")
 
     # Load model & processor
-    model = XVLA.from_pretrained(args.models)
+    model = (model_factory or XVLA.from_pretrained)(args.models)
     processor = XVLAProcessor.from_pretrained(args.models)
 
     # Iterable dataloader (don't wrap with prepare)
-    train_dataloader = create_dataloader(
+    train_dataloader = (dataloader_factory or create_dataloader)(
         batch_size=args.batch_size,
         metas_path=args.train_metas_path,
         num_actions=model.num_actions,
@@ -228,6 +228,8 @@ def main(args):
         # Forward & backward
         loss_dict: Dict[str, torch.Tensor] = model(**inputs)
         loss = sum(loss_dict.values())
+        if not torch.isfinite(loss).all():
+            raise RuntimeError(f"Non-finite training loss at step {global_step}")
         accelerator.backward(loss)
         if args.max_grad_norm:
             accelerator.clip_grad_norm_(model.parameters(), args.max_grad_norm)
