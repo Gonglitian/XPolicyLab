@@ -1,0 +1,17 @@
+diff --git a/scripts/deploy/deploy.py b/scripts/deploy/deploy.py
+index 15f30b0..8ee1a4a 100644
+--- a/scripts/deploy/deploy.py
++++ b/scripts/deploy/deploy.py
+@@ -121,9 +121,11 @@ def build(a):
+         if profile == 'pi05':
+             env = environment(root, 'pi05')
+             env['UV_PROJECT_ENVIRONMENT'] = str(root / 'envs/pi05')
+-            commands.run(boot, '-m', 'uv', 'sync', '--frozen', '--no-dev', '--project',
++            commands.run(boot, '-m', 'uv', 'sync', '--frozen', '--no-dev', '--no-install-package', 'rerun-sdk',  # BCC: RHEL 8 glibc 2.28 has no rerun-sdk wheel (visualization only)
++                         '--project',
+                          root / 'upstreams/openpi', '--python', python(root, 'pi05'), env=env)
+             pip(profile, '-r', HERE / 'requirements-robocasa-imports.txt')
++            pip(profile, 'pytest==8.3.5')  # openpi imports pytest at module level (gemma_pytorch.py); --no-dev drops it
+         elif profile == 'xvla':
+             pip(profile, 'torch==2.1.2', 'torchvision==0.16.2', '--index-url', 'https://download.pytorch.org/whl/cu121')
+             pip(profile, '-r', REPO / 'policy/X_VLA/xvla/requirements.txt', 'transformers==4.51.3', 'opencv-python-headless==4.11.0.86')
