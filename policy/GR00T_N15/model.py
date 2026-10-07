@@ -223,18 +223,20 @@ def decode_libero_action(action: dict[str, Any]) -> list[dict[str, np.ndarray]]:
 
 
 class Model(ModelTemplate):
-    """XPolicyLab wrapper for NVIDIA GR00T N1.5 LIBERO checkpoints."""
+    """XPolicyLab wrapper for GR00T N1.5 LIBERO and RoboCasa checkpoints."""
 
     def __init__(self, model_cfg: dict[str, Any]):
         self.model_cfg = model_cfg
-        if str(model_cfg.get('bench_name', 'libero')).lower() != 'libero':
-            raise ValueError('This N1.5 adapter requires a LIBERO checkpoint; PandaOmron needs its own adapter')
+        self.benchmark = str(model_cfg.get('bench_name', 'libero')).lower()
+        if self.benchmark not in {'libero', 'robocasa365'}:
+            raise ValueError('GR00T N1.5 supports LIBERO and RoboCasa365 checkpoints')
         self.action_type = str(model_cfg.get("action_type", "ee"))
         if self.action_type != "ee":
             raise ValueError("GR00T N1.5 LIBERO checkpoints require action_type=ee")
-        self.env_cfg_type = str(model_cfg.get("env_cfg_type") or "libero_franka")
-        if self.env_cfg_type != "libero_franka":
-            raise ValueError("LIBERO checkpoints require env_cfg_type=libero_franka")
+        expected_robot = 'libero_franka' if self.benchmark == 'libero' else 'robocasa_panda_omron'
+        self.env_cfg_type = str(model_cfg.get("env_cfg_type") or expected_robot)
+        if self.env_cfg_type != expected_robot:
+            raise ValueError(f'{self.benchmark} checkpoints require env_cfg_type={expected_robot}')
         from XPolicyLab.utils.process_data import get_robot_action_dim_info
 
         self.robot_action_dim_info = get_robot_action_dim_info(self.env_cfg_type)
@@ -247,12 +249,26 @@ class Model(ModelTemplate):
             sys.path.insert(0, str(gr00t_root))
 
         from gr00t.data.embodiment_tags import EmbodimentTag
-        from gr00t.experiment.data_config import load_data_config
         from gr00t.model.policy import Gr00tPolicy
+        import torch
+        torch.manual_seed(int(model_cfg.get('seed', 0)))
+        np.random.seed(int(model_cfg.get('seed', 0)))
 
-        self.suite = _suite_name(model_cfg)
-        data_config_name = _data_config_name(self.suite)
-        data_config = load_data_config(data_config_name)
+        if self.benchmark == 'libero':
+            from gr00t.experiment.data_config import load_data_config
+            self.suite = _suite_name(model_cfg)
+            data_config_name = str(model_cfg.get('data_config') or _data_config_name(self.suite))
+            data_config = load_data_config(data_config_name)
+            self._encode_observation = encode_libero_observation
+            self._decode_action = decode_libero_action
+        else:
+            from gr00t.experiment.data_config import PandaOmronDataConfig
+            from .robocasa import encode_observation, decode_action
+            self.suite = 'pretrain'
+            data_config_name = 'panda_omron'
+            data_config = PandaOmronDataConfig()
+            self._encode_observation = encode_observation
+            self._decode_action = decode_action
         checkpoint = _checkpoint_dir(model_cfg)
         self.default_prompt = str(
             model_cfg.get("default_prompt") or "Perform the manipulation task."
@@ -280,13 +296,13 @@ class Model(ModelTemplate):
         if len(set(self._env_ids)) != len(self._env_ids):
             raise ValueError("Duplicate environment indices")
         self._obs_list = [
-            encode_libero_observation(obs, self.default_prompt) for obs in obs_list
+            self._encode_observation(obs, self.default_prompt) for obs in obs_list
         ]
 
     def get_action(self, **kwargs):
         if not self._obs_list:
             raise AssertionError("Call update_obs before get_action")
-        return decode_libero_action(self.policy.get_action(self._obs_list[0]))
+        return self._decode_action(self.policy.get_action(self._obs_list[0]))
 
     def get_action_batch(self, env_idx_list=None, **kwargs):
         if not self._obs_list:
@@ -298,7 +314,7 @@ class Model(ModelTemplate):
         observations = dict(zip(self._env_ids, self._obs_list))
         if not set(indices).issubset(observations):
             raise ValueError("Requested environment has no current observation")
-        return [decode_libero_action(self.policy.get_action(observations[i])) for i in indices]
+        return [self._decode_action(self.policy.get_action(observations[i])) for i in indices]
 
     def reset(self):
         self._obs_list = []

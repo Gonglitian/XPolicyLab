@@ -78,11 +78,31 @@ The LIBERO and RoboCasa365 environment launchers delegate to the common
 [`benchmarks/run_client.sh`](../../benchmarks/run_client.sh). See the
 [contract and current validation limits](../../benchmarks/README.md).
 The LIBERO adapter uses `env_cfg_type=libero_franka`, `action_type=ee`.
-RoboCasa365 requires a separate PandaOmron-trained checkpoint and model-side
-state/action mapping; the existing LIBERO checkpoints are rejected for that benchmark.
+The RoboCasa365 adapter uses `env_cfg_type=robocasa_panda_omron`, `action_type=ee`,
+and the official Human300 JAX checkpoint described below.
 
 For `bench_name=LIBERO`, the adapter selects the official `pi05_libero` inference
 configuration (horizon 10, continuous state input, no extra delta transform),
 loads normalization from `assets/physical-intelligence/libero`, and requires
 the JAX `params/_METADATA` checkpoint. A PyTorch `model.safetensors` checkpoint
 is rejected. Existing ALOHA defaults do not apply to this branch.
+
+For `bench_name=RoboCasa365`, use the
+[RoboCasa OpenPI fork](https://github.com/robocasa-benchmark/openpi)
+(validated source revision `5a6beda9ff99da30b4e1b59320f6a32971d7c397`) on the
+policy process's `PYTHONPATH`. It provides `pi05_pretrain_human300`; the bundled
+OpenPI source does not supply this configuration. Use the corresponding
+`robocasa/robocasa365_checkpoints` checkpoint directory
+`pi05_pretrain_human300/multitask_learning/75000`, including `params/` and
+`assets/norm_stats.json`. Optimizer state is unnecessary for inference.
+
+This branch uses the official horizon of 50, discrete state tokens, and the
+checkpoint's saved mean/std statistics. It does not load training datasets to
+recompute statistics. The model adapter maps the shared observation to the
+official EEF-first 16-dimensional state and three RGB views, and maps the
+12-dimensional actions back to EEF delta, gripper, mobile base, and control
+mode. Use `ROBOCASA_ACTION_CHUNK_STEPS=5` for the official replanning interval.
+The simulator's task registry supplies the episode horizon unless
+`ROBOCASA_MAX_STEPS` is set. `BENCHMARK_VIDEO_DIR` enables MP4 recording through
+the shared launcher for either benchmark. These additions cover inference;
+RoboCasa training through this adapter has not been validated.

@@ -84,14 +84,19 @@ N1.5 reference uses 1, OpenPI uses 5, X-VLA consumes the full predicted chunk (3
 checkpoint). One-step replanning is useful for interface smoke tests but does not reproduce
 each paper's evaluation schedule. The shared default step budgets are 220/280/300/520 for
 spatial/object/goal/10; `--max-steps` or `LIBERO_MAX_STEPS` can override them. Outputs record
-the budget, wait steps, resolution and chunk length. These bounded 1–3 episode runs do not
+the budget, wait steps, resolution and chunk length. These bounded 1–5 episode runs do not
 constitute benchmark scores.
 
 The existing 10-argument policy `eval.sh` interface remains unchanged. For LIBERO pass
 `libero_franka ee`, an absolute checkpoint directory, and your policy/simulator environments.
 The shared launcher supports `LIBERO_TASK_ID`, `LIBERO_NUM_EPISODES`,
 `LIBERO_ACTION_CHUNK_STEPS`, `LIBERO_MAX_STEPS`, `BENCHMARK_OUTPUT_DIR` and
-`LIBERO_OUTPUT_DIR`. RoboCasa requires `ROBOCASA_SPLIT` and `ROBOCASA_SOURCE_KIND`.
+`LIBERO_OUTPUT_DIR`. `BENCHMARK_VIDEO_DIR` records MP4s for either benchmark.
+RoboCasa requires `ROBOCASA_SPLIT` and `ROBOCASA_SOURCE_KIND`; it supports
+`ROBOCASA_NUM_EPISODES`, `ROBOCASA_ACTION_CHUNK_STEPS` and `ROBOCASA_MAX_STEPS`.
+Omitting the latter uses the official task registry horizon. The 50-step example
+above checks the interface only and is too short to assess task success.
+The official RoboCasa recipes execute 5 actions per call for π0.5 and 16 for GR00T.
 Use separate output directories when comparing policies, to avoid overwriting results.
 
 ## Assets and validation status
@@ -115,11 +120,14 @@ all 16 OpenPI JAX files passed GCS CRC32C verification. Download provenance and
 verification manifests live alongside the remote assets; the final record is
 `/data2/vla-reasoning/proj/XPolicyLab-assets/checkpoints/libero-assets-status.json`.
 
-已完成代码层面的 client 解耦，并提供三个 policy 的 LIBERO 映射。34 项 CPU 测试已通过，覆盖
-不同图像方向、四元数/rot6d、夹爪方向、步数预算和协议边界；真实模型加载、GPU
-推理和模拟器闭环尚未执行。RoboCasa365 client 已独立，但三个 policy 的 PandaOmron
-模型端适配/checkpoint 尚未就绪，因此目前不能宣称 3×2 组合均已跑通。
-现有 LIBERO/双臂 adapter 对 RoboCasa365 请求明确报错。
+已完成公共 client 解耦，以及三个 policy 的 LIBERO 映射。2026-09-22 实测中，
+X-VLA 和 π0.5 JAX 在 `libero_spatial` task 0、初始状态 0–4 上各完成 5/5 次成功，
+并保存了各回合 MP4。这只验证该任务的闭环，不代表完整 benchmark 成绩。
+四合一 GR00T 在同一 LIBERO 任务上为 4/5 成功。RoboCasa365 的 `OpenDrawer`
+任务（pretrain split、seed 0–4、750 步上限）中，π0.5 为 4/5、GR00T 为 3/5；
+两者使用官方 Human300 checkpoint 的 PandaOmron 映射。各回合均有 MP4，
+包括达到步数上限的失败回合。X-VLA 暂无本次指定的
+RoboCasa365 checkpoint，因此未纳入该组合的 sanity check。
 
 ```bash
 python -m pytest benchmarks/tests policy/GR00T_N15/tests -q

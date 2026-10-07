@@ -39,6 +39,8 @@ def test_nan_action_is_rejected():
 
 def test_batch_reorder_and_subset():
     model = Model.__new__(Model)
+    from XPolicyLab.policy.GR00T_N15.model import decode_libero_action
+    model._decode_action = decode_libero_action
     model._obs_list = [{'value': 0.1}, {'value': 0.2}]
     model._env_ids = [2, 7]
     model.policy = SimpleNamespace(get_action=lambda obs: action(obs['value']))
@@ -146,4 +148,35 @@ def test_robocasa_truncation_is_not_success():
     env = SimpleNamespace(reset=lambda seed: (obs, {}), step=lambda act: (obs, 0, False, True, {'success': False}))
     client = SimpleNamespace(call=lambda func_name, **kwargs: [value] if func_name == 'get_action' else None)
     result = run_robocasa(env, client, seed=0, max_steps=5)
-    assert result == {'success': False, 'steps': 1}
+    assert result['success'] is False
+    assert result['steps'] == 1
+    assert result['truncated'] is True
+
+
+def test_robocasa_policy_mapping_roundtrip():
+    from XPolicyLab.benchmarks.robocasa365.contract import make_xpl_observation, xpl_action_to_gym
+    from XPolicyLab.policy.GR00T_N15.robocasa import encode_observation, decode_action
+    obs = {key: np.arange(48, dtype=np.uint8).reshape(4, 4, 3) for key in (
+        'video.robot0_agentview_left', 'video.robot0_agentview_right', 'video.robot0_eye_in_hand')}
+    obs.update({'state.base_position': [1, 2, 3], 'state.base_rotation': [0, 0, 0.6, 0.8],
+                'state.end_effector_position_relative': [4, 5, 6],
+                'state.end_effector_rotation_relative': [0.6, 0, 0, 0.8],
+                'state.gripper_qpos': [0.01, -0.01]})
+    shared_obs = make_xpl_observation(obs, 'Open the left drawer.')
+    for value in shared_obs['state'].values():
+        value.flags.writeable = False  # websocket-decoded arrays are read-only
+    policy_obs = encode_observation(shared_obs, '')
+    for key in obs:
+        np.testing.assert_allclose(policy_obs[key][0], obs[key])
+        if key.startswith('state.'):
+            assert policy_obs[key].flags.writeable
+    action = {
+        'action.end_effector_position': np.array([[0.1, 0.2, 0.3]], np.float32),
+        'action.end_effector_rotation': np.array([[0.02, -0.03, 0.04]], np.float32),
+        'action.gripper_close': np.array([[1]], np.float32),
+        'action.base_motion': np.array([[0.1, 0.2, -0.3, 0.4]], np.float32),
+        'action.control_mode': np.array([[0]], np.float32),
+    }
+    gym_action = xpl_action_to_gym(decode_action(action)[0])
+    for key, value in action.items():
+        np.testing.assert_allclose(gym_action[key], value[0], atol=1e-6)

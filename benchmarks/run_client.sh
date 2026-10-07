@@ -22,6 +22,10 @@ export PYTHONPATH="${XPL_ROOT}:${PYTHONPATH:-}"
 export MUJOCO_GL="${MUJOCO_GL:-egl}"
 output_dir="${BENCHMARK_OUTPUT_DIR:-${SCRIPT_DIR}/outputs}"
 mkdir -p "${output_dir}"
+video_args=()
+if [[ -n "${BENCHMARK_VIDEO_DIR:-}" ]]; then
+    video_args=(--video-dir "${BENCHMARK_VIDEO_DIR}")
+fi
 case "${bench_name,,}" in
     libero)
         if [[ "${EVAL_ENV_TYPE:-sim}" == debug ]]; then
@@ -35,16 +39,22 @@ case "${bench_name,,}" in
             --episodes "${LIBERO_NUM_EPISODES:-1}" --seed "${seed}" \
             --max-steps "${LIBERO_MAX_STEPS:-0}" \
             --action-chunk-steps "${LIBERO_ACTION_CHUNK_STEPS:-1}" \
+            "${video_args[@]}" \
             --output "${output_dir}/${task_name}_task${LIBERO_TASK_ID:-0}_seed${seed}.json"
         ;;
     robocasa365|robocasa)
         [[ "${EVAL_ENV_TYPE:-sim}" == sim ]] || { echo 'RoboCasa365 supports EVAL_ENV_TYPE=sim' >&2; exit 2; }
+        horizon_args=()
+        if [[ -n "${ROBOCASA_MAX_STEPS:-}" ]]; then
+            horizon_args=(--max-steps "${ROBOCASA_MAX_STEPS}")
+        fi
         exec python -m XPolicyLab.benchmarks.robocasa365.client \
             --host "${policy_server_ip}" --port "${policy_server_port}" \
             --task "${task_name}" --split "${ROBOCASA_SPLIT:?Set ROBOCASA_SPLIT=pretrain or target}" \
             --source-kind "${ROBOCASA_SOURCE_KIND:?Set ROBOCASA_SOURCE_KIND=human or mimicgen}" \
             --episodes "${ROBOCASA_NUM_EPISODES:-1}" --seed "${seed}" \
-            --max-steps "${ROBOCASA_MAX_STEPS:-50}" \
+            --action-steps "${ROBOCASA_ACTION_CHUNK_STEPS:-16}" \
+            "${horizon_args[@]}" "${video_args[@]}" \
             --output "${output_dir}/${task_name}_seed${seed}.json"
         ;;
     *) echo "Unsupported benchmark: ${bench_name}" >&2; exit 2 ;;

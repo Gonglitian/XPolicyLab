@@ -64,7 +64,7 @@ def make_env(task, seed: int, resolution: int = 256):
     return env
 
 
-def run_episode(env, client, obs, instruction, *, max_steps, wait_steps, chunk_steps):
+def run_episode(env, client, obs, instruction, *, max_steps, wait_steps, chunk_steps, record_frame=None):
     """Count simulator control steps, not policy queries, against the budget."""
     if hasattr(env, 'env'):
         for robot in env.env.robots:
@@ -74,6 +74,8 @@ def run_episode(env, client, obs, instruction, *, max_steps, wait_steps, chunk_s
         if done:
             return True, 0
     steps = 0
+    if record_frame is not None:
+        record_frame(obs)
     while steps < max_steps:
         observation = make_xpl_observation(obs, instruction)
         if hasattr(env, 'env'):
@@ -94,6 +96,8 @@ def run_episode(env, client, obs, instruction, *, max_steps, wait_steps, chunk_s
                     robot.controller.use_delta = mode == 'delta'
             obs, _, done, _ = env.step(xpl_action_to_libero(action))
             steps += 1
+            if record_frame is not None:
+                record_frame(obs)
             if done:
                 return True, steps
     return False, steps
@@ -102,8 +106,8 @@ def run_episode(env, client, obs, instruction, *, max_steps, wait_steps, chunk_s
 def run(args: argparse.Namespace) -> dict:
     if args.episodes < 1 or args.action_chunk_steps < 1 or args.wait_steps < 0 or args.max_steps < 0:
         raise ValueError("Episodes/chunk steps must be positive; step limits must be nonnegative")
-    if args.episodes > 3:
-        raise ValueError("This entry point is a smoke test: use 1–3 episodes")
+    if args.episodes > 5:
+        raise ValueError("This entry point is a sanity check: use 1–5 episodes")
     from client_server.ws import WsModelClient
     from libero.libero import benchmark
 
@@ -122,17 +126,37 @@ def run(args: argparse.Namespace) -> dict:
     )
     successes = []
     control_steps = []
+    videos = []
+    video_dir = Path(args.video_dir) if getattr(args, 'video_dir', None) else None
+    if video_dir is not None:
+        import imageio.v2 as imageio
+        video_dir.mkdir(parents=True, exist_ok=True)
     try:
         for episode in range(args.episodes):
             env = make_env(task, args.seed + episode, args.resolution)
+            writer = None
             try:
                 env.reset()
                 obs = env.set_init_state(initial_states[episode % len(initial_states)])
                 client.call(func_name="reset")
+                if video_dir is not None:
+                    video_path = video_dir / f'{args.suite}_task{args.task_id}_seed{args.seed + episode}_running.mp4'
+                    writer = imageio.get_writer(str(video_path), fps=args.video_fps, codec='libx264')
+                def record_frame(frame_obs):
+                    if writer is not None:
+                        # Upright visualization only; model observations stay unchanged.
+                        writer.append_data(np.ascontiguousarray(frame_obs['agentview_image'][::-1, ::-1]))
                 done, steps = run_episode(
                     env, client, obs, task.language, max_steps=max_steps,
                     wait_steps=args.wait_steps, chunk_steps=args.action_chunk_steps,
+                    record_frame=record_frame if writer is not None else None,
                 )
+                if writer is not None:
+                    writer.close()
+                    writer = None
+                    final_video = video_path.with_name(video_path.name.replace('_running', '_success' if done else '_failure'))
+                    video_path.rename(final_video)
+                    videos.append(str(final_video))
                 control_steps.append(steps)
                 successes.append(bool(done))
                 print(
@@ -140,6 +164,8 @@ def run(args: argparse.Namespace) -> dict:
                     f"episode={episode} success={bool(done)}"
                 )
             finally:
+                if writer is not None:
+                    writer.close()
                 env.close()
     finally:
         client.close()
@@ -147,6 +173,8 @@ def run(args: argparse.Namespace) -> dict:
     result = {
         "suite": args.suite,
         "task_id": args.task_id,
+        "task_name": task.name,
+        "instruction": task.language,
         "episodes": args.episodes,
         "successes": successes,
         "success_rate": float(np.mean(successes)) if successes else 0.0,
@@ -156,6 +184,7 @@ def run(args: argparse.Namespace) -> dict:
         "wait_steps": args.wait_steps,
         "action_chunk_steps": args.action_chunk_steps,
         "resolution": args.resolution,
+        "videos": videos,
         "purpose": "integration_smoke_only",
     }
     output = Path(args.output)
@@ -183,6 +212,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--resolution", type=int, default=256)
     parser.add_argument("--request-timeout", type=float, default=180.0)
     parser.add_argument("--output", default="outputs/libero_smoke.json")
+    parser.add_argument("--video-dir", default=None)
+    parser.add_argument("--video-fps", type=int, default=20)
     return parser.parse_args()
 
 
